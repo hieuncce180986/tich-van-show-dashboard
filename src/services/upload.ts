@@ -6,9 +6,12 @@ const uploadToCloudinary = async (files: any) => {
     for (const file of files) {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", CONSTANT.CLOUDINARY_UPLOAD_PRESET);
-      formData.append("folder", CONSTANT.CLOUDINARY_FOLDER);
-      const response = await fetch(CONSTANT.CLOUDINARY_API, {
+      formData.append(
+        "upload_preset",
+        CONSTANT.CLOUDINARY.CLOUDINARY_UPLOAD_PRESET
+      );
+      formData.append("folder", CONSTANT.CLOUDINARY.CLOUDINARY_FOLDER_IMAGE);
+      const response = await fetch(CONSTANT.CLOUDINARY.CLOUDINARY_API_IMAGE, {
         method: "POST",
         body: formData,
         redirect: "follow",
@@ -34,9 +37,12 @@ const uploadToCloudinaryVideo = async (files: any) => {
     for (const file of files) {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", CONSTANT.CLOUDINARY_UPLOAD_PRESET);
-      formData.append("folder", CONSTANT.CLOUDINARY_FOLDER);
-      const response = await fetch(CONSTANT.CLOUDINARY_API_VIDEO, {
+      formData.append(
+        "upload_preset",
+        CONSTANT.CLOUDINARY.CLOUDINARY_UPLOAD_PRESET
+      );
+      formData.append("folder", CONSTANT.CLOUDINARY.CLOUDINARY_FOLDER_VIDEO);
+      const response = await fetch(CONSTANT.CLOUDINARY.CLOUDINARY_API_VIDEO, {
         method: "POST",
         body: formData,
         redirect: "follow",
