@@ -21,13 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={font.className} suppressHydrationWarning={true}>
         <ToastProvider>
-          <div className="flex">
-            {/* hidden md:hidden lg:hidden xl: */}
-            {children}
-          </div>
-          {/* <div className="flex md:flex lg:flex xl:hidden">
-            <NotFoundPage />
-          </div> */}
+          <div className="flex">{children}</div>
         </ToastProvider>
         <Toaster />
       </body>

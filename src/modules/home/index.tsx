@@ -19,24 +19,18 @@ import { useSearchParams } from "next/navigation";
 import Product from "./modules/product";
 import Order from "./modules/order";
 import Blog from "./modules/blog";
-import Customer from "./modules/customer";
-import Discount from "./modules/discount";
 
 export default function HomeClient() {
   const param = useSearchParams();
 
   const renderTab = (tab: string) => {
     switch (tab) {
-      case "product":
+      case "tab1":
         return <Product />;
-      case "order":
+      case "tab2":
         return <Order />;
-      case "blog":
+      case "tab3":
         return <Blog />;
-      case "customer":
-        return <Customer />;
-      case "discount":
-        return <Discount />;
       default:
         return <Product />;
     }
@@ -44,18 +38,14 @@ export default function HomeClient() {
 
   const renderBreadcrumb = (tab: string) => {
     switch (tab) {
-      case "product":
-        return "Sản Phẩm";
-      case "order":
-        return "Đơn Hàng";
-      case "blog":
-        return "Bài Viết";
-      case "customer":
-        return "Khách Hàng";
-      case "discount":
-        return "Mã giảm giá";
+      case "tab1":
+        return "Tab 1";
+      case "tab2":
+        return "Tab 2";
+      case "tab3":
+        return "Tab 3";
       default:
-        return "Sản Phẩm";
+        return "Tab 1";
     }
   };
 
@@ -78,7 +68,7 @@ export default function HomeClient() {
                 <BreadcrumbItem>
                   <BreadcrumbPage>
                     <span className="text-[16px]">
-                      {renderBreadcrumb(param.get("tab") || "product")}
+                      {renderBreadcrumb(param.get("tab") || "tab1")}
                     </span>
                   </BreadcrumbPage>
                 </BreadcrumbItem>
@@ -88,7 +78,7 @@ export default function HomeClient() {
         </header>
         <div className="w-full h-[1.5px] bg-black opacity-10"></div>
         <div className="flex flex-1 flex-col">
-          {renderTab(param.get("tab") || "product")}
+          {renderTab(param.get("tab") || "tab1")}
         </div>
       </SidebarInset>
     </SidebarProvider>

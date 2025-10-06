@@ -1,16 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  FileText,
-  PackageOpen,
-  LogOut,
-  Newspaper,
-  Users,
-  Percent,
-  CirclePercent,
-  BadgePercent,
-} from "lucide-react";
+import { FileText, PackageOpen, LogOut, Newspaper } from "lucide-react";
 import { NavProjects } from "./nav-projects";
 import { TeamSwitcher } from "./team-switcher";
 import {
@@ -26,34 +17,22 @@ import { ROUTES } from "@/utils/route";
 const data = {
   projects: [
     {
-      name: "Sản Phẩm",
-      url: "?tab=product",
-      tab: "product",
+      name: "Tab 1",
+      url: "?tab=tab1",
+      tab: "tab1",
       icon: <PackageOpen size={17} />,
     },
     {
-      name: "Đơn Hàng",
-      url: "?tab=order",
-      tab: "order",
+      name: "Tab 2",
+      url: "?tab=tab2",
+      tab: "tab2",
       icon: <FileText size={17} />,
     },
     {
-      name: "Bài Viết",
-      url: "?tab=blog",
-      tab: "blog",
+      name: "Tab 3",
+      url: "?tab=tab3",
+      tab: "tab3",
       icon: <Newspaper size={17} />,
-    },
-    {
-      name: "Khách Hàng",
-      url: "?tab=customer",
-      tab: "customer",
-      icon: <Users size={17} />,
-    },
-    {
-      name: "Mã giảm giá",
-      url: "?tab=discount",
-      tab: "discount",
-      icon: <BadgePercent size={17} />,
     },
   ],
 };
