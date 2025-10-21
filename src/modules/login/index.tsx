@@ -35,7 +35,7 @@ export default function LoginClient() {
     setIsLoading(true);
 
     try {
-      if (username === "admin" && password === "123") {
+      if (username === "tichvanshow" && password === "tichvan@6789") {
         Cookies.set("isLogin", "true", { expires: 7 });
         window.location.href = ROUTES.HOME;
         setIsLoading(false);
@@ -69,7 +69,7 @@ export default function LoginClient() {
                 height={40}
                 className="rounded-full"
               />
-              <h1 className="text-2xl font-bold">In Ảnh Hạ Thu</h1>
+              <h1 className="text-2xl font-bold">Tịch Văn Show</h1>
             </div>
           </div>
           <div className="mt-4">

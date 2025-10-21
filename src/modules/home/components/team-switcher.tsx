@@ -27,7 +27,7 @@ export function TeamSwitcher() {
             />
           </div>
           <div className="grid flex-1 text-left text-[16px] leading-tight">
-            <span className="truncate font-semibold">IN ẢNH HẠ THU</span>
+            <span className="truncate font-semibold">TỊCH VĂN SHOW</span>
             <span className="truncate text-[13px]">Admin</span>
           </div>
         </SidebarMenuButton>

@@ -2,41 +2,43 @@ import { API } from "@/utils/api";
 
 const getAll = async () => {
   try {
-    const response = await fetch(API.GET_ALL_PRODUCTS, {
+    const response = await fetch(API.GET_ALL_TICKETS, {
       method: "GET",
     });
     if (!response.ok) {
       throw new Error(`Failed - Status: ${response.status}`);
     }
     const data = await response.json();
-    return data;
+
+    // Return the structured data with pending, confirmed, and rejected tickets
+    return data.data || data;
   } catch (error: any) {
-    console.error("========= Error Get All Products:", error);
+    console.error("========= Error Get All Tickets:", error);
     return false;
   }
 };
 
-const getAllWithDeleted = async () => {
-  try {
-    const response = await fetch(API.GET_ALL_PRODUCTS_W_DELETED, {
-      method: "GET",
-    });
-    if (!response.ok) {
-      throw new Error(`Failed - Status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error: any) {
-    console.error("========= Error Get All Products:", error);
-    return false;
-  }
-};
+// const getAllWithDeleted = async () => {
+//   try {
+//     const response = await fetch(API.GET_ALL_PRODUCTS_W_DELETED, {
+//       method: "GET",
+//     });
+//     if (!response.ok) {
+//       throw new Error(`Failed - Status: ${response.status}`);
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error: any) {
+//     console.error("========= Error Get All Products:", error);
+//     return false;
+//   }
+// };
 
-const createProduct = async (payload: any) => {
+const createTicket = async (payload: any) => {
   try {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    const response = await fetch(API.CREATE_PRODUCT, {
+    const response = await fetch(API.CREATE_TICKET, {
       method: "POST",
       headers: myHeaders,
       body: JSON.stringify(payload),
@@ -47,17 +49,17 @@ const createProduct = async (payload: any) => {
     }
     return true;
   } catch (error: any) {
-    console.error("========= Error Create Product:", error);
+    console.error("========= Error Create Ticket:", error);
     return false;
   }
 };
 
-const updateProduct = async (id: any, payload: any) => {
+const updateTicket = async (id: any, payload: any) => {
   try {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
-    const response = await fetch(`${API.UPDATE_PRODUCT}/${id}`, {
+    const response = await fetch(`${API.UPDATE_TICKET}/${id}`, {
       method: "PUT",
       headers: myHeaders,
       body: JSON.stringify(payload),
@@ -71,34 +73,14 @@ const updateProduct = async (id: any, payload: any) => {
     console.log("check update: success", response.status);
     return true;
   } catch (error: any) {
-    console.error("========= Error Update Product:", error);
+    console.error("========= Error Update Ticket:", error);
     return false;
   }
 };
 
-const deleteProduct = async (id: any) => {
+const getTicketById = async (id: string) => {
   try {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const response = await fetch(`${API.DELETE_PRODUCT}/${id}`, {
-      method: "DELETE",
-      headers: myHeaders,
-      redirect: "follow",
-      body: JSON.stringify({}),
-    });
-    if (!response.ok) {
-      throw new Error(`Failed - Status: ${response.status}`);
-    }
-    return true;
-  } catch (error: any) {
-    console.error("========= Error Delete Product:", error);
-    return false;
-  }
-};
-
-const getProductById = async (id: string) => {
-  try {
-    const response = await fetch(`${API.GET_PRODUCT}/${id}`, {
+    const response = await fetch(`${API.GET_TICKET_BY_ID}/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -107,22 +89,107 @@ const getProductById = async (id: string) => {
 
     if (!response.ok) {
       console.error(`Login failed - Status: ${response.status}`);
-      throw new Error(`Get Product Failed - Status: ${response.status}`);
+      throw new Error(`Get Ticket Failed - Status: ${response.status}`);
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("========= Error Get product:", error);
+    console.error("========= Error Get Ticket:", error);
     throw error;
   }
 };
 
-export const ProductService = {
+const approveTicket = async (id: string, payload: any) => {
+  try {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const response = await fetch(`${API.APPROVE_TICKET}/${id}`, {
+      method: "PUT",
+      headers: myHeaders,
+      body: JSON.stringify(payload),
+      redirect: "follow",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed - Status: ${response.status}`);
+    }
+
+    return response;
+  } catch (error: any) {
+    console.error("========= Error Approve Ticket:", error);
+    return false;
+  }
+};
+
+const rejectTicket = async (id: string, payload: any) => {
+  try {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    // const payload = reason ? { rejected_reason: reason } : {};
+
+    const response = await fetch(`${API.REJECT_TICKET}/${id}`, {
+      method: "PUT",
+      headers: myHeaders,
+      body: JSON.stringify(payload),
+      redirect: "follow",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed - Status: ${response.status}`);
+    }
+
+    return true;
+  } catch (error: any) {
+    console.error("========= Error Reject Ticket:", error);
+    return false;
+  }
+};
+
+// Helper function to get tickets by status
+const getTicketsByStatus = (
+  data: any,
+  status: "pending" | "confirmed" | "rejected"
+) => {
+  if (!data || !data[status]) {
+    return { tickets: [], total_quantity: 0, total_price: 0 };
+  }
+  return data[status];
+};
+
+// Helper function to get total statistics
+const getTotalStats = (data: any) => {
+  if (!data) {
+    return { totalTickets: 0, totalQuantity: 0, totalPrice: 0 };
+  }
+
+  const totalTickets =
+    (data.pending?.tickets?.length || 0) +
+    (data.confirmed?.tickets?.length || 0) +
+    (data.rejected?.tickets?.length || 0);
+
+  const totalQuantity =
+    (data.pending?.total_quantity || 0) +
+    (data.confirmed?.total_quantity || 0) +
+    (data.rejected?.total_quantity || 0);
+
+  const totalPrice =
+    (data.pending?.total_price || 0) +
+    (data.confirmed?.total_price || 0) +
+    (data.rejected?.total_price || 0);
+
+  return { totalTickets, totalQuantity, totalPrice };
+};
+
+export const TicketService = {
   getAll,
-  getAllWithDeleted,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  getProductById,
+  createTicket,
+  updateTicket,
+  getTicketById,
+  approveTicket,
+  rejectTicket,
+  getTicketsByStatus,
+  getTotalStats,
 };

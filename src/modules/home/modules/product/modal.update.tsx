@@ -15,198 +15,38 @@ import {
 import ProductDescriptionEditor from "./quill";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { ProductService } from "@/services/product";
-import {
-  ImageUp,
-  Loader,
-  Plus,
-  SquarePen,
-  Trash2,
-  Upload,
-  X,
-} from "lucide-react";
+import { TicketService } from "@/services/product";
+import { ImageUp, Loader, Plus, SquarePen, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Select from "react-select";
 import { UploadService } from "@/services/upload";
+import { Lens } from "@/components/ui/lens";
 
-export function ModalUpdateProduct({ data }: { data: any }) {
-  const colorMap: { [key: string]: string } = {
-    white: "#FFFFFF",
-    black: "#000000",
-    gold: "#EBB305",
-    silver: "#C0C0C0",
-    wood: "#713F11",
-  };
-
-  const colorOpt = [
-    { value: "white", label: "Trắng" },
-    { value: "black", label: "Đen" },
-    { value: "gold", label: "Gold" },
-    { value: "silver", label: "Bạc" },
-    { value: "wood", label: "Gỗ" },
-  ];
-
-  const customStyles = {
-    option: (provided: any, state: { isFocused: boolean }) => ({
-      ...provided,
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      backgroundColor: state.isFocused ? "#EEEEEE" : "white",
-      color: "black",
-      cursor: "pointer",
-    }),
-    control: (provided: any) => ({
-      ...provided,
-      borderColor: "#CFCFCF",
-      boxShadow: "none",
-      "&:hover": {
-        borderColor: "#CFCFCF",
-      },
-    }),
-  };
-
-  const formatOptionLabel = ({
-    value,
-    label,
-  }: {
-    value: string;
-    label: string;
-  }) => (
-    <div className="flex items-center gap-2">
-      <span
-        className={`w-4 h-4 rounded-sm border ${
-          value === "white"
-            ? "border-gray-500"
-            : value === "black"
-            ? "border-black"
-            : value === "gold"
-            ? "border-yellow-500"
-            : value === "silver"
-            ? "border-neutral-300"
-            : "border-amber-900"
-        } }`}
-        style={{ backgroundColor: colorMap[value] }}
-      ></span>
-      {label}
-    </div>
-  );
-
-  const selectedColors = colorOpt.filter((color) =>
-    data?.color?.includes(color.value)
-  );
+export function ModalUpdateTicket({ data }: { data: any }) {
+  const [hovering, setHovering] = useState(false);
 
   const { toast } = useToast();
 
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const secondaryImageInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isLoadingForDelete, setIsLoadingForDelete] = useState<boolean>(false);
 
   const [mainPreview, setMainPreview] = useState<string | null>(null);
   const [secondaryPreviews, setSecondaryPreviews] = useState<string[]>([]);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
 
   const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [introduction, setIntroduction] = useState<string>("");
-  const [category, setCategory] = useState<string>("");
-  const [color, setColor] = useState<string[]>(data?.color ?? []);
-  const [sizesAndPrices, setSizesAndPrices] = useState<
-    { size: string; price: string }[]
-  >([{ size: "", price: "" }]);
-  const [rating, setRating] = useState<string>("");
-  const [discount, setDiscount] = useState<string>("");
-  const [active, setActive] = useState<boolean>(false);
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [isVideoRemoved, setIsVideoRemoved] = useState<boolean>(false);
-
-  const handleVideoFile = useCallback(
-    (file: File) => {
-      if (file.size > 50 * 1024 * 1024) {
-        toast({
-          variant: "destructive",
-          title: "File quá lớn",
-          description: "Vui lòng chọn file nhỏ hơn 50MB.",
-        });
-        return;
-      }
-
-      if (!file.type.includes("mp4")) {
-        toast({
-          variant: "destructive",
-          title: "Định dạng không hợp lệ",
-          description: "Vui lòng chọn file video MP4.",
-        });
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (reader.result) {
-          setVideoPreview(reader.result as string);
-          setVideoFile(file);
-          setIsVideoRemoved(false);
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Lỗi",
-            description: "Không thể đọc file video.",
-          });
-        }
-      };
-      reader.onerror = () => {
-        toast({
-          variant: "destructive",
-          title: "Lỗi",
-          description: "Đã xảy ra lỗi khi đọc file.",
-        });
-      };
-      reader.readAsDataURL(file);
-    },
-    [toast]
-  );
-
-  const handleRemoveVideo = () => {
-    setVideoPreview(null);
-    setVideoFile(null);
-    setIsVideoRemoved(true);
-    if (videoInputRef.current) {
-      videoInputRef.current.value = "";
-    }
-  };
-
-  const handleVideoDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
-    const file = event.dataTransfer.files?.[0];
-    if (file) {
-      handleVideoFile(file);
-    }
-  };
-
-  const handleVideoDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleVideoDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    handleVideoFile(file);
-  };
-
-  const handleUpdateVideo = () => {
-    videoInputRef.current?.click();
-  };
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [schedule, setSchedule] = useState<string>("");
+  const [price, setPrice] = useState<number>(69000);
+  const [quantity, setQuantity] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
+  const [bankImage, setBankImage] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
+  const [rejectedReason, setRejectedReason] = useState<string>("");
 
   const handleMainImageChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -258,192 +98,62 @@ export function ModalUpdateProduct({ data }: { data: any }) {
     mainImageInputRef.current?.click();
   };
 
-  const handleUpdateSecondaryImages = () => {
-    secondaryImageInputRef.current?.click();
-  };
-
-  const handleRemoveSecondaryImage = (index: number) => {
-    setSecondaryPreviews((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleColorChange = (selectedOptions: any) => {
-    const selectedValues = selectedOptions.map((option: any) => option.value);
-    setColor(selectedValues);
-  };
-
-  const handleSizePriceChange = (
-    index: number,
-    field: "size" | "price",
-    value: string
-  ) => {
-    const updatedSizesAndPrices = [...sizesAndPrices];
-    if (field === "price") {
-      if (value === "" || /^\d*$/.test(value)) {
-        updatedSizesAndPrices[index][field] = value;
-      }
-    } else {
-      updatedSizesAndPrices[index][field] = value;
-    }
-    setSizesAndPrices(updatedSizesAndPrices);
-  };
-
-  const handleAddSizePrice = () => {
-    setSizesAndPrices([...sizesAndPrices, { size: "", price: "" }]);
-  };
-
-  const handleRemoveSizePrice = (index: number) => {
-    if (sizesAndPrices.length > 1) {
-      setSizesAndPrices(sizesAndPrices.filter((_, i) => i !== index));
-    }
-  };
-
   const validateForm = () => {
-    if (!mainPreview) {
-      toast({
-        variant: "destructive",
-        title: "Vui lòng chọn ảnh chính.",
-      });
-      return false;
-    }
-
-    if (secondaryPreviews.length === 0) {
-      toast({
-        variant: "destructive",
-        title: "Vui lòng thêm ít nhất một ảnh phụ.",
-      });
-      return false;
-    }
-
     if (!name.trim()) {
       toast({
         variant: "destructive",
-        title: "Vui lòng nhập tên.",
+        title: "Vui lòng nhập họ và tên.",
       });
       return false;
     }
 
-    if (!description.trim()) {
+    if (!email.trim()) {
       toast({
         variant: "destructive",
-        title: "Vui lòng nhập mô tả.",
+        title: "Vui lòng nhập email.",
       });
       return false;
     }
 
-    if (!introduction.trim()) {
+    if (!phone.trim()) {
       toast({
         variant: "destructive",
-        title: "Vui lòng nhập phần giới thiệu.",
+        title: "Vui lòng nhập số điện thoại.",
       });
       return false;
     }
 
-    if (!category.trim()) {
+    if (!schedule.trim()) {
       toast({
         variant: "destructive",
-        title: "Vui lòng chọn danh mục.",
+        title: "Vui lòng chọn suất chiếu.",
       });
       return false;
     }
 
-    if (!color) {
+    if (!status.trim()) {
       toast({
         variant: "destructive",
-        title: "Vui lòng chọn màu sắc.",
+        title: "Vui lòng chọn trạng thái.",
       });
       return false;
     }
 
-    if (sizesAndPrices.some((sp) => !sp.size.trim() || !sp.price.trim())) {
+    if (quantity <= 0) {
       toast({
         variant: "destructive",
-        title: "Vui lòng nhập đầy đủ kích cỡ và giá.",
+        title: "Vui lòng nhập số lượng vé.",
       });
       return false;
     }
 
-    const sizeRegex = /^\d+x\d+$/;
-    if (
-      sizesAndPrices.some(
-        (sp) => !sp.size.trim() || !sp.price.trim() || !sizeRegex.test(sp.size)
-      )
-    ) {
+    if (status === "rejected" && !rejectedReason.trim()) {
       toast({
         variant: "destructive",
-        title: "Kích cỡ phải theo định dạng sốxsố (ví dụ: 15x21).",
+        title: "Vui lòng nhập lý do từ chối.",
       });
       return false;
     }
-
-    // Validate price: integer only and > 1000
-    const integerRegex = /^\d+$/;
-    if (
-      sizesAndPrices.some((sp) => {
-        const priceStr = `${sp.price}`.trim();
-        if (!integerRegex.test(priceStr)) return true;
-        const priceNum = Number(priceStr);
-        return priceNum <= 1000;
-      })
-    ) {
-      toast({
-        variant: "destructive",
-        title: "Giá phải là số nguyên và lớn hơn 1000.",
-      });
-      return false;
-    }
-
-    // Validate rating selected
-    if (!rating || !`${rating}`.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Vui lòng chọn đánh giá.",
-      });
-      return false;
-    }
-
-    // Validate discount: required, 0-100 inclusive, max 1 decimal place
-    if (!`${discount}`.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Vui lòng nhập giảm giá sản phẩm.",
-      });
-      return false;
-    }
-
-    const discountNum = Number(discount);
-    if (!isFinite(discountNum) || isNaN(discountNum)) {
-      toast({
-        variant: "destructive",
-        title: "Giảm giá phải là số.",
-      });
-      return false;
-    }
-
-    if (discountNum < 0 || discountNum > 100) {
-      toast({
-        variant: "destructive",
-        title: "Giảm giá phải trong khoảng 0 đến 100.",
-      });
-      return false;
-    }
-
-    const hasTooManyDecimals =
-      `${discount}`.includes(".") && `${discount}`.split(".")[1].length > 1;
-    if (hasTooManyDecimals) {
-      toast({
-        variant: "destructive",
-        title: "Giảm giá chỉ được phép tối đa 1 chữ số thập phân.",
-      });
-      return false;
-    }
-
-    // if (!videoFile && !data?.video) {
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Vui lòng chọn video.",
-    //   });
-    //   return false;
-    // }
 
     return true;
   };
@@ -511,79 +221,66 @@ export function ModalUpdateProduct({ data }: { data: any }) {
     if (!validateForm()) return;
     setIsLoading(true);
 
-    const updatedDescription = await replaceBase64WithCloudUrls(
-      description,
-      handleImageUpload
-    );
-    const updatedIntroduction = await replaceBase64WithCloudUrls(
-      introduction,
-      handleImageUpload
-    );
-
-    let videoUrl = data?.video;
-
-    if (isVideoRemoved) {
-      videoUrl = "";
-    } else if (videoFile) {
-      const uploadVideo: any = await UploadService.uploadToCloudinaryVideo([
-        videoFile,
-      ]);
-      videoUrl = uploadVideo[0]?.url || "";
-    }
-
     const body = {
+      show_name: "Tên Show diễn",
       name: name,
-      description: updatedDescription,
-      introduction: updatedIntroduction,
-      product_option: sizesAndPrices.map((sp) => ({
-        size: sp.size,
-        price: sp.price,
-      })),
-      category: category,
-      color: color,
-      discount: discount,
-      rating: rating,
-      thumbnail: mainPreview,
-      images: secondaryPreviews,
-      active: active,
-      video: videoUrl,
+      email: email,
+      phone: phone,
+      schedule: schedule,
+      quantity: quantity,
+      total: total,
+      status: status,
+      rejected_reason: status === "rejected" ? rejectedReason : "",
+      bank_image: mainPreview,
     };
 
-    const response = await ProductService.updateProduct(data?._id, body);
+    let response;
+
+    try {
+      if (status === "pending") {
+        response = await TicketService.updateTicket(data?._id, body);
+      } else if (status === "approved") {
+        response = await TicketService.approveTicket(data?._id, body);
+        console.log("check body: APV", JSON.stringify(body));
+      } else if (status === "rejected") {
+        response = await TicketService.rejectTicket(data?._id, body);
+      }
+    } catch (error) {
+      console.error("Error updating ticket:", error);
+      response = false;
+    }
 
     setIsLoading(false);
-    window.location.href = "/?tab=product";
-  };
 
-  const handleDelete = async () => {
-    setIsLoadingForDelete(true);
-    await ProductService.deleteProduct(data?._id);
-    setIsLoadingForDelete(false);
-    window.location.href = "/?tab=product";
+    // if (response) {
+    //   toast({
+    //     title: "Cập nhật thành công!",
+    //     description: "Thông tin vé đã được cập nhật.",
+    //   });
+    //   window.location.reload();
+    // } else {
+    //   toast({
+    //     variant: "destructive",
+    //     title: "Cập nhật thất bại!",
+    //     description: "Vui lòng thử lại sau.",
+    //   });
+    // }
   };
 
   const updateDOM = () => {
     if (data) {
-      setName(data?.name);
-      setSizesAndPrices(
-        Array.isArray(data?.product_option) && data.product_option.length > 0
-          ? data.product_option.map((sp: any) => ({
-              size: sp.size || "",
-              price: sp.price || "",
-            }))
-          : [{ size: "", price: "" }]
-      );
-      setCategory(data?.category);
-      setColor(data?.color);
-      setRating(data?.rating);
-      setDiscount(data?.discount);
-      setDescription(data?.description);
-      setIntroduction(data?.introduction);
-      setMainPreview(data?.thumbnail);
-      setSecondaryPreviews(data?.images);
-      setActive(data?.active);
-      setVideoPreview(data?.video);
-      setIsVideoRemoved(false);
+      setName(data?.name || "");
+      setEmail(data?.email || "");
+      setPhone(data?.phone || "");
+      setSchedule(data?.schedule || "");
+      setPrice(data?.price || 69000);
+      setQuantity(data?.quantity || 0);
+      setTotal(data?.total || 0);
+      setBankImage(data?.bank_image || "");
+      setStatus(data?.status || "");
+      setRejectedReason(data?.rejected_reason || "");
+      setMainPreview(data?.bank_image || "");
+      setSecondaryPreviews(data?.images || []);
     }
   };
 
@@ -620,11 +317,148 @@ export function ModalUpdateProduct({ data }: { data: any }) {
           </DialogDescription>
         </DialogHeader>
         <div className="w-full grid grid-cols-3 gap-8">
+          <div className="col-span-2">
+            <div className="flex flex-col justify-start items-start gap-2 overflow-y-auto hide-scrollbar max-h-[70vh] pr-0 scroll-bar-style">
+              <Label htmlFor="description" className="text-[14.5px]">
+                Họ và tên
+              </Label>
+              <div className="w-full grid items-center gap-4">
+                <input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Họ và tên"
+                  className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                />
+              </div>
+              <Label htmlFor="email" className="text-[14.5px]">
+                Email
+              </Label>
+              <div className="w-full grid items-center gap-4">
+                <input
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                  className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                />
+              </div>
+              <Label htmlFor="phone" className="text-[14.5px]">
+                Số điện thoại
+              </Label>
+              <div className="w-full grid items-center gap-4">
+                <input
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Số điện thoại"
+                  className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                />
+              </div>
+              <Label htmlFor="description" className="text-[14.5px]">
+                Giá vé
+              </Label>
+              <div className="w-full grid items-center gap-4">
+                <input
+                  id="price"
+                  value={price}
+                  type="number"
+                  disabled
+                  placeholder="Giá vé"
+                  className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                />
+              </div>
+              <Label htmlFor="description" className="text-[14.5px] mt-2">
+                Chọn suất chiếu
+              </Label>
+              <div className="w-full grid items-center gap-4">
+                <select
+                  id="schedule"
+                  value={schedule}
+                  onChange={(e) => {
+                    setSchedule(e.target.value);
+                  }}
+                  className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                >
+                  <option value="">Chọn suất chiếu</option>
+                  <option value="show-morning">Sáng (8:00)</option>
+                  <option value="show-afternoon">Chiều (14:00)</option>
+                </select>
+              </div>
+              <Label htmlFor="status" className="text-[14.5px] mt-2">
+                Trạng thái
+              </Label>
+              <div className="w-full grid items-center gap-4">
+                <select
+                  id="status"
+                  value={status}
+                  onChange={(e) => {
+                    setStatus(e.target.value);
+                  }}
+                  className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                >
+                  <option value="">Chọn trạng thái</option>
+                  <option value="pending">Đang chờ</option>
+                  <option value="approved">Xác nhận</option>
+                  <option value="rejected">Từ chối</option>
+                </select>
+              </div>
+
+              <Label htmlFor="description" className="text-[14.5px]">
+                Số lượng vé
+              </Label>
+              <div className="w-full grid items-center gap-4">
+                <input
+                  id="quantity"
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => {
+                    const newQuantity = parseInt(e.target.value) || 0;
+                    setQuantity(newQuantity);
+                    setTotal(newQuantity * price);
+                  }}
+                  placeholder="Số lượng"
+                  className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                />
+              </div>
+
+              <Label htmlFor="total" className="text-[14.5px]">
+                Tổng cộng
+              </Label>
+              <div className="w-full grid items-center gap-4">
+                <input
+                  id="total"
+                  type="number"
+                  value={total}
+                  disabled
+                  placeholder="Tổng cộng"
+                  className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                />
+              </div>
+
+              {status === "rejected" && (
+                <>
+                  <Label htmlFor="rejectedReason" className="text-[14.5px]">
+                    Lý do từ chối
+                  </Label>
+                  <div className="w-full grid items-center gap-4">
+                    <textarea
+                      id="rejectedReason"
+                      value={rejectedReason}
+                      onChange={(e) => setRejectedReason(e.target.value)}
+                      placeholder="Nhập lý do từ chối"
+                      className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
           <div className="col-span-1">
             <div className="overflow-y-auto hide-scrollbar max-h-[70vh] scroll-bar-style">
               <div className="mb-6">
-                <Label htmlFor="thumbnail" className="text-right !text-[16px]">
-                  Hình chính
+                <Label htmlFor="bankImage" className="text-right !text-[16px]">
+                  Hình ảnh chuyển khoản
                 </Label>
                 <div className="mt-2">
                   {!mainPreview && (
@@ -649,8 +483,8 @@ export function ModalUpdateProduct({ data }: { data: any }) {
                   />
                   {mainPreview && (
                     <div className="mt-2">
-                      <div className="relative group w-full h-80">
-                        <div className="absolute top-0 left-0 right-0 bottom-0 group-hover:bg-black rounded-md opacity-25 z-0 transform duration-200"></div>
+                      <div className="relative group w-full h-full">
+                        {/* <div className="absolute top-0 left-0 right-0 bottom-0 group-hover:bg-black rounded-md opacity-25 z-0 transform duration-200"></div>
                         <div className="cursor-pointer absolute top-[43%] left-[43%] hidden group-hover:flex z-10 transform duration-200">
                           <div className="bg-indigo-600 hover:bg-indigo-700 p-2 rounded-full">
                             <Upload
@@ -659,318 +493,25 @@ export function ModalUpdateProduct({ data }: { data: any }) {
                               size={26}
                             />
                           </div>
-                        </div>
-                        <Image
-                          src={mainPreview}
-                          alt="main-preview"
-                          className="w-full h-full object-cover rounded-md mt-2 border border-gray-200"
-                          width={1000}
-                          height={1000}
-                        />
+                        </div> */}
+                        <Lens hovering={hovering} setHovering={setHovering}>
+                          <Image
+                            src={mainPreview}
+                            alt="bank-image-preview"
+                            className="w-full h-full object-contain rounded-md mt-2 border border-gray-200"
+                            width={1000}
+                            height={1000}
+                          />
+                        </Lens>
                       </div>
                     </div>
                   )}
                 </div>
-              </div>
-              <Label htmlFor="images" className="text-right !text-[16px]">
-                Hình phụ
-              </Label>
-              <div className="col-span-3 mt-2">
-                <div
-                  onClick={handleUpdateSecondaryImages}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-white py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 hover:text-primary-700 cursor-pointer"
-                >
-                  <div className="flex flex-col items-center">
-                    <span>+ Tải lên</span>
-                  </div>
-                </div>
-                <input
-                  type="file"
-                  ref={secondaryImageInputRef}
-                  onChange={handleSecondaryImagesChange}
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-3 mt-4 pr-2">
-                {secondaryPreviews?.map((preview: any, index: any) => (
-                  <div key={index} className="relative">
-                    <Image
-                      src={preview}
-                      alt={`secondary-preview-${index}`}
-                      className="rounded-sm border border-gray-200 w-full h-28 object-cover"
-                      width={1000}
-                      height={1000}
-                    />
-                    <button
-                      onClick={() => handleRemoveSecondaryImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full text-xs"
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <div className="my-6">
-                <Label htmlFor="video" className="text-right !text-[16px]">
-                  Video
-                </Label>
-                <div className="mt-2">
-                  {!videoPreview && (
-                    <div
-                      onClick={handleUpdateVideo}
-                      onDrop={handleVideoDrop}
-                      onDragOver={handleVideoDragOver}
-                      onDragLeave={handleVideoDragLeave}
-                      className={`flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed ${
-                        isDragging
-                          ? "border-orange-500 bg-orange-50"
-                          : "border-gray-300"
-                      } bg-white px-5 py-16 text-sm font-medium text-gray-900 hover:bg-gray-50 hover:text-primary-700 cursor-pointer`}
-                    >
-                      <div className="flex flex-col items-center">
-                        <span>+ Tải video lên</span>
-                        <span className="text-xs text-gray-500">
-                          hoặc kéo thả file MP4 vào đây
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    ref={videoInputRef}
-                    onChange={handleVideoChange}
-                    accept="video/mp4"
-                    className="hidden"
-                  />
-                  {videoPreview && (
-                    <div className="mt-2 relative">
-                      <video
-                        className="h-full w-full rounded-lg object-contain object-center"
-                        controls
-                        autoPlay={false}
-                        muted
-                        onError={() => {
-                          toast({
-                            variant: "destructive",
-                            title: "Lỗi",
-                            description: "Không thể tải video để xem trước.",
-                          });
-                        }}
-                      >
-                        <source src={videoPreview} type="video/mp4" />
-                        Your browser does not support the video tag.
-                      </video>
-                      <button
-                        onClick={handleRemoveVideo}
-                        className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
-                        title="Xóa video"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col-span-2">
-            <div className="flex flex-col justify-start items-start gap-2 overflow-y-auto hide-scrollbar max-h-[70vh] pr-0 scroll-bar-style">
-              <div className="mb-3 flex flex-col gap-3 items-center">
-                <Label htmlFor="active" className="text-[16px] mt-2">
-                  Trạng thái
-                </Label>
-                <input
-                  type="checkbox"
-                  id="active"
-                  className="switch ml-0"
-                  checked={active}
-                  onChange={(e) => setActive(e.target.checked)}
-                />
-              </div>
-              <Label htmlFor="description" className="text-[14.5px]">
-                Tên sản phẩm
-              </Label>
-              <div className="w-full grid items-center gap-4">
-                <textarea
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Tên sản phẩm"
-                  className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
-                ></textarea>
-              </div>
-              <Label htmlFor="description" className="text-[14.5px] mt-2">
-                Chọn danh mục
-              </Label>
-              <div className="w-full grid items-center gap-4">
-                <select
-                  id="category"
-                  value={category}
-                  onChange={(e) => {
-                    setCategory(e.target.value);
-                  }}
-                  className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
-                >
-                  <option value="">Chọn danh mục</option>
-                  <option value="Plastic">In ảnh rời</option>
-                  <option value="Plastic-Frame">In ảnh có khung viền</option>
-                  <option value="Frame">Khung lẻ</option>
-                  <option value="Album">Album/Photobook</option>
-                </select>
-              </div>
-              <div className="flex flex-col gap-4 w-full">
-                {sizesAndPrices.map((sp, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-row justify-between items-center gap-4 w-full"
-                  >
-                    <div className="flex flex-col w-full">
-                      <Label
-                        htmlFor={`size-${index}`}
-                        className="text-[14.5px]"
-                      >
-                        Kích cỡ
-                      </Label>
-                      <div className="w-full grid items-center gap-4 mt-1">
-                        <input
-                          id={`size-${index}`}
-                          value={sp.size}
-                          onChange={(e) =>
-                            handleSizePriceChange(index, "size", e.target.value)
-                          }
-                          placeholder="Kích cỡ"
-                          className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex flex-col w-full">
-                      <Label
-                        htmlFor={`price-${index}`}
-                        className="text-[14.5px]"
-                      >
-                        Giá sản phẩm
-                      </Label>
-                      <div className="w-full grid items-center gap-4 mt-1">
-                        <input
-                          id={`price-${index}`}
-                          value={sp.price}
-                          onChange={(e) =>
-                            handleSizePriceChange(
-                              index,
-                              "price",
-                              e.target.value
-                            )
-                          }
-                          placeholder="Giá"
-                          className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
-                        />
-                      </div>
-                    </div>
-                    {sizesAndPrices.length > 1 && (
-                      <button
-                        onClick={() => handleRemoveSizePrice(index)}
-                        className="mt-6 bg-red-500 text-white p-2 rounded-full"
-                      >
-                        <X size={16} />
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <div>
-                  <button
-                    type="button"
-                    onClick={handleAddSizePrice}
-                    className="p-1.5 flex flex-row justify-center items-center gap-2 text-white bg-indigo-600 hover:opacity-80 font-medium rounded-full text-sm !text-[16px] text-center"
-                  >
-                    <Plus size={20} />
-                  </button>
-                </div>
-              </div>
-              <Label htmlFor="description" className="text-[14.5px] mt-2">
-                Chọn màu sắc
-              </Label>
-              <div className="w-full grid items-center gap-4">
-                <Select
-                  className="pl-[0.5px]"
-                  options={colorOpt}
-                  value={colorOpt.filter((colorOptItem) =>
-                    color.includes(colorOptItem.value)
-                  )}
-                  isMulti={true}
-                  placeholder="Chọn màu"
-                  onChange={handleColorChange}
-                  styles={customStyles}
-                  formatOptionLabel={formatOptionLabel}
-                />
-              </div>
-
-              <Label htmlFor="description" className="text-[14.5px]">
-                Discount (%)
-              </Label>
-              <div className="w-full grid items-center gap-4">
-                <input
-                  id="discount"
-                  type="number"
-                  value={discount}
-                  onChange={(e) => setDiscount(e.target.value)}
-                  placeholder="Giảm giá sản phẩm"
-                  className="col-span-3 p-2 border border-[#CFCFCF] placeholder-custom rounded"
-                ></input>
-              </div>
-
-              <Label htmlFor="description" className="text-[14.5px] mt-2">
-                Đánh giá sản phẩm
-              </Label>
-              <div className="w-full grid items-center gap-4">
-                <select
-                  id="rating"
-                  value={rating}
-                  onChange={(e) => {
-                    setRating(e.target.value);
-                  }}
-                  className="col-span-3 p-2 border border-[#CFCFCF] rounded"
-                >
-                  <option value="">Chọn đánh giá</option>
-                  <option value="0">0 ⭐️</option>
-                  <option value="1">1 ⭐️</option>
-                  <option value="2">2 ⭐️</option>
-                  <option value="3">3 ⭐️</option>
-                  <option value="4">4 ⭐️</option>
-                  <option value="5">5 ⭐️</option>
-                </select>
-              </div>
-              <div className="w-full mt-2">
-                <ProductDescriptionEditor
-                  value={description}
-                  onChange={setDescription}
-                  title="Mô tả sản phẩm"
-                />
-              </div>
-              <div className="w-full mt-2">
-                <ProductDescriptionEditor
-                  value={introduction}
-                  onChange={setIntroduction}
-                  title="Giới thiệu sản phẩm"
-                />
               </div>
             </div>
           </div>
         </div>
         <DialogFooter className="w-full !flex !flex-row !justify-between !items-center">
-          <Button
-            onClick={handleDelete}
-            type="submit"
-            className="!px-8 !text-[16px] text-red-600 bg-white border-2 border-red-600 hover:bg-red-600 hover:text-white"
-          >
-            <Trash2 />
-            Xoá
-            {isLoadingForDelete && (
-              <Loader className="animate-spin" size={48} />
-            )}
-          </Button>
           <div className="flex gap-2">
             <DialogClose asChild>
               <Button

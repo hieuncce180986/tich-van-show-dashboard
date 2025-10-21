@@ -17,22 +17,10 @@ import { ROUTES } from "@/utils/route";
 const data = {
   projects: [
     {
-      name: "Tab 1",
-      url: "?tab=tab1",
-      tab: "tab1",
+      name: "Tickets",
+      url: "?tab=tickets",
+      tab: "tickets",
       icon: <PackageOpen size={17} />,
-    },
-    {
-      name: "Tab 2",
-      url: "?tab=tab2",
-      tab: "tab2",
-      icon: <FileText size={17} />,
-    },
-    {
-      name: "Tab 3",
-      url: "?tab=tab3",
-      tab: "tab3",
-      icon: <Newspaper size={17} />,
     },
   ],
 };

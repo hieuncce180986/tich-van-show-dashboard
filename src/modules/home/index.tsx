@@ -16,36 +16,26 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useSearchParams } from "next/navigation";
-import Product from "./modules/product";
-import Order from "./modules/order";
-import Blog from "./modules/blog";
+import Tickets from "./modules/product";
 
 export default function HomeClient() {
   const param = useSearchParams();
 
   const renderTab = (tab: string) => {
     switch (tab) {
-      case "tab1":
-        return <Product />;
-      case "tab2":
-        return <Order />;
-      case "tab3":
-        return <Blog />;
+      case "tickets":
+        return <Tickets />;
       default:
-        return <Product />;
+        return <Tickets />;
     }
   };
 
   const renderBreadcrumb = (tab: string) => {
     switch (tab) {
-      case "tab1":
-        return "Tab 1";
-      case "tab2":
-        return "Tab 2";
-      case "tab3":
-        return "Tab 3";
+      case "tickets":
+        return "Tickets";
       default:
-        return "Tab 1";
+        return "Tickets";
     }
   };
 
