@@ -8,7 +8,6 @@ import Cookies from "js-cookie";
 import { ROUTES } from "@/utils/route";
 import { Loader, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AccountService } from "@/services/account";
 
 export default function LoginClient() {
   const { toast } = useToast();
