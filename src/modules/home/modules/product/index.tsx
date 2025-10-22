@@ -290,7 +290,7 @@ export default function Tickets() {
                 }`}
                 onClick={() => switchTab("pending")}
               >
-                PENDING ({ticketData.pending.tickets.length})
+                ĐANG CHỜ ({ticketData.pending.tickets.length})
               </div>
               <div
                 className={`cursor-pointer border px-2 py-1 rounded-lg w-36 text-center ${
@@ -300,7 +300,7 @@ export default function Tickets() {
                 }`}
                 onClick={() => switchTab("approved")}
               >
-                APPROVED ({ticketData.approved.tickets.length})
+                XÁC NHẬN ({ticketData.approved.tickets.length})
               </div>
               <div
                 className={`cursor-pointer border px-2 py-1 rounded-lg w-36 text-center ${
@@ -310,79 +310,88 @@ export default function Tickets() {
                 }`}
                 onClick={() => switchTab("rejected")}
               >
-                REJECTED ({ticketData.rejected.tickets.length})
+                TỪ CHỐI ({ticketData.rejected.tickets.length})
               </div>
             </div>
             <div className="flex flex-row justify-start items-start gap-6 w-full mt-5">
               <div className="flex flex-row items-center">
-                <div className="cursor-pointer px-4 py-1 rounded-lg bg-blue-50 border border-blue-200">
-                  PENDING:{" "}
-                  <span className="text-lg text-blue-600">
+                <div className="cursor-pointer px-4 py-1 rounded-lg bg-yellow-50 border border-yellow-200">
+                  ĐANG CHỜ:{" "}
+                  <span className="text-lg text-black font-bold italic">
                     {" "}
                     {ticketData.pending.total_quantity} vé
                   </span>
                   <div>
-                    <div className="text-lg text-blue-600 flex flex-row items-center gap-2">
+                    <div className="text-lg text-black flex flex-row items-center gap-2">
                       Suất sáng:{" "}
                       {ticketData.pending.total_quantity_pending_show_morning}{" "}
-                      vé <MoveRight /> Còn lại:{" "}
-                      {AMOUNT_MORNING_TICKETS -
-                        ticketData.pending
-                          .total_quantity_pending_show_morning}{" "}
                       vé
                     </div>
-                    <div className="text-lg text-blue-600 flex flex-row items-center gap-2">
+                    <div className="text-lg text-black flex flex-row items-center gap-2">
                       Suất chiều:{" "}
                       {ticketData.pending.total_quantity_pending_show_afternoon}{" "}
-                      vé <MoveRight /> Còn lại:{" "}
-                      {AMOUNT_AFTERNOON_TICKETS -
-                        ticketData.pending
-                          .total_quantity_pending_show_afternoon}{" "}
                       vé
                     </div>
                   </div>
-                  <span className="text-sm text-blue-500">
+                  <span className="text-sm text-fuchsia-700 font-bold">
                     {ticketData.pending.total_price.toLocaleString()} VND
                   </span>
                 </div>
               </div>
               <div className="flex flex-row items-center">
                 <div className="cursor-pointer px-4 py-1 rounded-lg bg-green-50 border border-green-200">
-                  APPROVED:{" "}
-                  <span className="text-lg text-blue-600">
+                  XÁC NHẬN:{" "}
+                  <span className="text-lg text-black font-bold italic">
                     {ticketData.approved.total_quantity} vé
                   </span>
                   <div>
-                    <div className="text-lg text-blue-600 flex flex-row items-center gap-2">
+                    <div className="text-lg text-black flex flex-row items-center gap-2">
                       Suất sáng:{" "}
                       {ticketData.approved.total_quantity_approved_show_morning}{" "}
-                      vé <MoveRight /> Còn lại:{" "}
-                      {AMOUNT_MORNING_TICKETS -
-                        ticketData.approved
-                          .total_quantity_approved_show_morning}{" "}
                       vé
                     </div>
-                    <div className="text-lg text-blue-600 flex flex-row items-center gap-2">
+                    <div className="text-lg text-black flex flex-row items-center gap-2">
                       Suất chiều:{" "}
                       {
                         ticketData.approved
                           .total_quantity_approved_show_afternoon
                       }{" "}
-                      vé <MoveRight /> Còn lại:{" "}
-                      {AMOUNT_AFTERNOON_TICKETS -
-                        ticketData.approved
-                          .total_quantity_approved_show_afternoon}{" "}
                       vé
                     </div>
                   </div>
-                  <span className="text-sm text-green-500">
+                  <span className="text-sm text-fuchsia-700 font-bold">
                     {ticketData.approved.total_price.toLocaleString()} VND
                   </span>
                 </div>
               </div>
               <div className="flex flex-row items-center">
+                <div className="cursor-pointer px-4 py-1 rounded-lg bg-blue-50 border border-blue-200">
+                  CÒN LẠI:{" "}
+                  <div>
+                    <div className="text-lg text-black flex flex-row items-center gap-2">
+                      Suất sáng:{" "}
+                      {AMOUNT_MORNING_TICKETS -
+                        (ticketData.approved
+                          .total_quantity_approved_show_morning +
+                          ticketData.pending
+                            .total_quantity_pending_show_morning)}{" "}
+                      vé
+                    </div>
+                    <div className="text-lg text-black flex flex-row items-center gap-2">
+                      Suất chiều:{" "}
+                      {AMOUNT_AFTERNOON_TICKETS -
+                        (ticketData.approved
+                          .total_quantity_approved_show_afternoon +
+                          ticketData.pending
+                            .total_quantity_pending_show_afternoon)}{" "}
+                      vé
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-row items-center">
                 <div className="cursor-pointer px-4 py-1 rounded-lg bg-red-50 border border-red-200">
-                  REJECTED:{" "}
+                  TỪ CHỐI:{" "}
                   <strong className="text-lg text-red-600">
                     {ticketData.rejected.total_quantity} vé
                   </strong>
@@ -393,7 +402,7 @@ export default function Tickets() {
                 </div>
               </div>
               <div className="cursor-pointer px-4 py-1 rounded-lg bg-indigo-50 border border-indigo-200">
-                TOTAL INCOME:{" "}
+                DOANH THU:{" "}
                 <strong className="text-lg text-indigo-600">
                   {ticketData.approved.total_price // ticketData.pending.total_price +
                     // + ticketData.rejected.total_price

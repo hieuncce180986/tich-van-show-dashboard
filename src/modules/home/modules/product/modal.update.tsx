@@ -252,19 +252,19 @@ export function ModalUpdateTicket({ data }: { data: any }) {
 
     setIsLoading(false);
 
-    // if (response) {
-    //   toast({
-    //     title: "Cập nhật thành công!",
-    //     description: "Thông tin vé đã được cập nhật.",
-    //   });
-    //   window.location.reload();
-    // } else {
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Cập nhật thất bại!",
-    //     description: "Vui lòng thử lại sau.",
-    //   });
-    // }
+    if (response) {
+      toast({
+        title: "Cập nhật thành công!",
+        description: "Thông tin vé đã được cập nhật.",
+      });
+      window.location.reload();
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Cập nhật thất bại!",
+        description: "Vui lòng thử lại sau.",
+      });
+    }
   };
 
   const updateDOM = () => {
