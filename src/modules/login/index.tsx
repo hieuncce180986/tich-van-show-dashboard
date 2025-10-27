@@ -56,9 +56,9 @@ export default function LoginClient() {
   };
 
   return (
-    <div className="w-full h-screen flex flex-col justify-center items-center p-60">
+    <div className="w-full h-screen flex flex-col justify-center items-center lg:p-60">
       <div className="flex w-3/4 bg-slate-100 rounded-xl">
-        <div className="w-1/2 p-8 flex flex-col">
+        <div className="w-full p-8 flex flex-col lg:w-1/2">
           <div className="mb-4">
             <div className="flex justify-start items-center gap-4">
               <Image
