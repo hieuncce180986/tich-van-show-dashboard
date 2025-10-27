@@ -371,6 +371,8 @@ export default function Tickets() {
                     </span>
                   </div>
                 </div>
+              </div>
+              <div className="flex flex-row justify-start items-start gap-6">
                 <div className="flex flex-row items-center">
                   <div className="cursor-pointer px-4 py-1 rounded-lg bg-blue-50 border border-blue-200">
                     CÒN LẠI:{" "}
@@ -396,8 +398,6 @@ export default function Tickets() {
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-row justify-start items-start gap-6">
                 <div className="flex flex-row items-center">
                   <div className="cursor-pointer px-4 py-1 rounded-lg bg-red-50 border border-red-200">
                     TỪ CHỐI:{" "}
@@ -410,6 +410,8 @@ export default function Tickets() {
                     </span>
                   </div>
                 </div>
+              </div>
+              <div className="flex flex-col lg:flex-row justify-start items-start gap-6">
                 <div className="cursor-pointer px-4 py-1 rounded-lg bg-indigo-50 border border-indigo-200">
                   DOANH THU:{" "}
                   <strong className="text-lg text-indigo-600">
@@ -432,96 +434,98 @@ export default function Tickets() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto mt-0">
-                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                  <thead className="text-md text-gray-700 uppercase bg-gray-50 border dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                      <th scope="col" className="w-52 px-4 py-3">
-                        Họ và tên
-                      </th>
-                      <th scope="col" className="w-32 px-4 py-3">
-                        Email
-                      </th>
-                      <th scope="col" className="w-32 px-4 py-3">
-                        Số điện thoại
-                      </th>
-                      <th scope="col" className="w-32 px-4 py-3">
-                        Suất chiếu
-                      </th>
-                      <th scope="col" className="w-32 px-4 py-3">
-                        Số lượng
-                      </th>
-                      <th scope="col" className="w-32 px-4 py-3">
-                        Tổng tiền
-                      </th>
-                      <th scope="col" className="w-32 py-3">
-                        Trạng thái
-                      </th>
-                      <th scope="col" className="w-24 px-4 py-3">
-                        Chi tiết
-                      </th>
-                    </tr>
-                  </thead>
+              <div className="overflow-x-auto mt-0 w-full max-w-full">
+                <div className="min-w-max">
+                  <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 min-w-[800px]">
+                    <thead className="text-md text-gray-700 uppercase bg-gray-50 border dark:bg-gray-700 dark:text-gray-400">
+                      <tr>
+                        <th scope="col" className="w-52 px-4 py-3">
+                          Họ và tên
+                        </th>
+                        <th scope="col" className="w-32 px-4 py-3">
+                          Email
+                        </th>
+                        <th scope="col" className="w-32 px-4 py-3">
+                          Số điện thoại
+                        </th>
+                        <th scope="col" className="w-32 px-4 py-3">
+                          Suất chiếu
+                        </th>
+                        <th scope="col" className="w-32 px-4 py-3">
+                          Số lượng
+                        </th>
+                        <th scope="col" className="w-32 px-4 py-3">
+                          Tổng tiền
+                        </th>
+                        <th scope="col" className="w-32 py-3">
+                          Trạng thái
+                        </th>
+                        <th scope="col" className="w-24 px-4 py-3">
+                          Chi tiết
+                        </th>
+                      </tr>
+                    </thead>
 
-                  <tbody>
-                    {currenData?.map((item: any, index: any) => {
-                      return (
-                        <tr
-                          key={index}
-                          className={`${
-                            item?.deleted_at ? "hidden" : ""
-                          } border-b border-l border-r dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700`}
-                        >
-                          <td className="w-52 px-4 py-2 gap-3 items-center">
-                            <div className="w-full col-span-9 text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                              {item?.name}
-                            </div>
-                          </td>
-                          <td className="w-32 px-4 py-2">
-                            <span className="text-[14px] bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                              {item?.email}
-                            </span>
-                          </td>
-                          <td className="w-32 px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            <div className="flex items-center">
-                              {item?.phone}
-                            </div>
-                          </td>
-                          <td className="w-32 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            {item?.schedule === "show-morning"
-                              ? "Sáng (8:00)"
-                              : "Tối (18:00)"}
-                          </td>
-                          <td className="w-32 text-[14px] px-11 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            {item?.quantity}
-                          </td>
-                          <td className="w-32 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            {item?.total?.toLocaleString()} VND
-                          </td>
-                          <td className="w-32 text-[14px] px-0 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                item?.status === "pending"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : item?.status === "approved" ||
-                                    item?.status === "approved"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {item?.status === "approved"
-                                ? "APPROVED"
-                                : item?.status?.toUpperCase()}
-                            </span>
-                          </td>
-                          <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            <ModalUpdateTicket data={item} />
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                    <tbody>
+                      {currenData?.map((item: any, index: any) => {
+                        return (
+                          <tr
+                            key={index}
+                            className={`${
+                              item?.deleted_at ? "hidden" : ""
+                            } border-b border-l border-r dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700`}
+                          >
+                            <td className="w-52 px-4 py-2 gap-3 items-center">
+                              <div className="w-full col-span-9 text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                                {item?.name}
+                              </div>
+                            </td>
+                            <td className="w-32 px-4 py-2">
+                              <span className="text-[14px] bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                                {item?.email}
+                              </span>
+                            </td>
+                            <td className="w-32 px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                              <div className="flex items-center">
+                                {item?.phone}
+                              </div>
+                            </td>
+                            <td className="w-32 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                              {item?.schedule === "show-morning"
+                                ? "Sáng (8:00)"
+                                : "Tối (18:00)"}
+                            </td>
+                            <td className="w-32 text-[14px] px-11 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                              {item?.quantity}
+                            </td>
+                            <td className="w-32 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                              {item?.total?.toLocaleString()} VND
+                            </td>
+                            <td className="w-32 text-[14px] px-0 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  item?.status === "pending"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : item?.status === "approved" ||
+                                      item?.status === "approved"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {item?.status === "approved"
+                                  ? "APPROVED"
+                                  : item?.status?.toUpperCase()}
+                              </span>
+                            </td>
+                            <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                              <ModalUpdateTicket data={item} />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
               <nav
                 className="flex flex-col items-start justify-center mt-4 p-4 space-y-3 md:flex-row md:items-center md:space-y-0"
