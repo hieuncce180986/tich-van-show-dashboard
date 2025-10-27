@@ -237,7 +237,7 @@ export default function Tickets() {
             </div>
           </div>
         </div>
-        <div className="h-[640px] flex flex-col justify-start gap-5">
+        <div className="h-full lg:h-[640px] flex flex-col justify-start gap-5">
           {/* Summary Statistics */}
           {/* <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mt-5">
             <h3 className="text-lg font-semibold text-gray-800 mb-3">
@@ -313,102 +313,112 @@ export default function Tickets() {
                 TỪ CHỐI ({ticketData.rejected.tickets.length})
               </div>
             </div>
-            <div className="flex flex-row justify-start items-start gap-6 w-full mt-5">
-              <div className="flex flex-row items-center">
-                <div className="cursor-pointer px-4 py-1 rounded-lg bg-yellow-50 border border-yellow-200">
-                  ĐANG CHỜ:{" "}
-                  <span className="text-lg text-black font-bold italic">
-                    {" "}
-                    {ticketData.pending.total_quantity} vé
-                  </span>
-                  <div>
-                    <div className="text-lg text-black flex flex-row items-center gap-2">
-                      Suất sáng:{" "}
-                      {ticketData.pending.total_quantity_pending_show_morning}{" "}
-                      vé
-                    </div>
-                    <div className="text-lg text-black flex flex-row items-center gap-2">
-                      Suất chiều:{" "}
-                      {ticketData.pending.total_quantity_pending_show_afternoon}{" "}
-                      vé
-                    </div>
-                  </div>
-                  <span className="text-sm text-fuchsia-700 font-bold">
-                    {ticketData.pending.total_price.toLocaleString()} VND
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-row items-center">
-                <div className="cursor-pointer px-4 py-1 rounded-lg bg-green-50 border border-green-200">
-                  XÁC NHẬN:{" "}
-                  <span className="text-lg text-black font-bold italic">
-                    {ticketData.approved.total_quantity} vé
-                  </span>
-                  <div>
-                    <div className="text-lg text-black flex flex-row items-center gap-2">
-                      Suất sáng:{" "}
-                      {ticketData.approved.total_quantity_approved_show_morning}{" "}
-                      vé
-                    </div>
-                    <div className="text-lg text-black flex flex-row items-center gap-2">
-                      Suất chiều:{" "}
-                      {
-                        ticketData.approved
-                          .total_quantity_approved_show_afternoon
-                      }{" "}
-                      vé
-                    </div>
-                  </div>
-                  <span className="text-sm text-fuchsia-700 font-bold">
-                    {ticketData.approved.total_price.toLocaleString()} VND
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-row items-center">
-                <div className="cursor-pointer px-4 py-1 rounded-lg bg-blue-50 border border-blue-200">
-                  CÒN LẠI:{" "}
-                  <div>
-                    <div className="text-lg text-black flex flex-row items-center gap-2">
-                      Suất sáng:{" "}
-                      {AMOUNT_MORNING_TICKETS -
-                        (ticketData.approved
-                          .total_quantity_approved_show_morning +
+            <div className="flex flex-col lg:flex-row justify-start items-start gap-6 w-full mt-5">
+              <div className="flex flex-row justify-start items-start gap-6">
+                <div className="flex flex-row items-center">
+                  <div className="cursor-pointer px-4 py-1 rounded-lg bg-yellow-50 border border-yellow-200">
+                    ĐANG CHỜ:{" "}
+                    <span className="text-lg text-black font-bold italic">
+                      {" "}
+                      {ticketData.pending.total_quantity} vé
+                    </span>
+                    <div>
+                      <div className="text-lg text-black flex flex-row items-center gap-2">
+                        Suất sáng:{" "}
+                        {ticketData.pending.total_quantity_pending_show_morning}{" "}
+                        vé
+                      </div>
+                      <div className="text-lg text-black flex flex-row items-center gap-2">
+                        Suất chiều:{" "}
+                        {
                           ticketData.pending
-                            .total_quantity_pending_show_morning)}{" "}
-                      vé
+                            .total_quantity_pending_show_afternoon
+                        }{" "}
+                        vé
+                      </div>
                     </div>
-                    <div className="text-lg text-black flex flex-row items-center gap-2">
-                      Suất chiều:{" "}
-                      {AMOUNT_AFTERNOON_TICKETS -
-                        (ticketData.approved
-                          .total_quantity_approved_show_afternoon +
-                          ticketData.pending
-                            .total_quantity_pending_show_afternoon)}{" "}
-                      vé
+                    <span className="text-sm text-fuchsia-700 font-bold">
+                      {ticketData.pending.total_price.toLocaleString()} VND
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-row items-center">
+                  <div className="cursor-pointer px-4 py-1 rounded-lg bg-green-50 border border-green-200">
+                    XÁC NHẬN:{" "}
+                    <span className="text-lg text-black font-bold italic">
+                      {ticketData.approved.total_quantity} vé
+                    </span>
+                    <div>
+                      <div className="text-lg text-black flex flex-row items-center gap-2">
+                        Suất sáng:{" "}
+                        {
+                          ticketData.approved
+                            .total_quantity_approved_show_morning
+                        }{" "}
+                        vé
+                      </div>
+                      <div className="text-lg text-black flex flex-row items-center gap-2">
+                        Suất chiều:{" "}
+                        {
+                          ticketData.approved
+                            .total_quantity_approved_show_afternoon
+                        }{" "}
+                        vé
+                      </div>
+                    </div>
+                    <span className="text-sm text-fuchsia-700 font-bold">
+                      {ticketData.approved.total_price.toLocaleString()} VND
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-row items-center">
+                  <div className="cursor-pointer px-4 py-1 rounded-lg bg-blue-50 border border-blue-200">
+                    CÒN LẠI:{" "}
+                    <div>
+                      <div className="text-lg text-black flex flex-row items-center gap-2">
+                        Suất sáng:{" "}
+                        {AMOUNT_MORNING_TICKETS -
+                          (ticketData.approved
+                            .total_quantity_approved_show_morning +
+                            ticketData.pending
+                              .total_quantity_pending_show_morning)}{" "}
+                        vé
+                      </div>
+                      <div className="text-lg text-black flex flex-row items-center gap-2">
+                        Suất chiều:{" "}
+                        {AMOUNT_AFTERNOON_TICKETS -
+                          (ticketData.approved
+                            .total_quantity_approved_show_afternoon +
+                            ticketData.pending
+                              .total_quantity_pending_show_afternoon)}{" "}
+                        vé
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-row items-center">
-                <div className="cursor-pointer px-4 py-1 rounded-lg bg-red-50 border border-red-200">
-                  TỪ CHỐI:{" "}
-                  <strong className="text-lg text-red-600">
-                    {ticketData.rejected.total_quantity} vé
+              <div className="flex flex-row justify-start items-start gap-6">
+                <div className="flex flex-row items-center">
+                  <div className="cursor-pointer px-4 py-1 rounded-lg bg-red-50 border border-red-200">
+                    TỪ CHỐI:{" "}
+                    <strong className="text-lg text-red-600">
+                      {ticketData.rejected.total_quantity} vé
+                    </strong>
+                    <br />
+                    <span className="text-sm text-red-500">
+                      {ticketData.rejected.total_price.toLocaleString()} VND
+                    </span>
+                  </div>
+                </div>
+                <div className="cursor-pointer px-4 py-1 rounded-lg bg-indigo-50 border border-indigo-200">
+                  DOANH THU:{" "}
+                  <strong className="text-lg text-indigo-600">
+                    {ticketData.approved.total_price // ticketData.pending.total_price +
+                      // + ticketData.rejected.total_price
+                      .toLocaleString()}{" "}
+                    VND
                   </strong>
-                  <br />
-                  <span className="text-sm text-red-500">
-                    {ticketData.rejected.total_price.toLocaleString()} VND
-                  </span>
                 </div>
-              </div>
-              <div className="cursor-pointer px-4 py-1 rounded-lg bg-indigo-50 border border-indigo-200">
-                DOANH THU:{" "}
-                <strong className="text-lg text-indigo-600">
-                  {ticketData.approved.total_price // ticketData.pending.total_price +
-                    // + ticketData.rejected.total_price
-                    .toLocaleString()}{" "}
-                  VND
-                </strong>
               </div>
             </div>
           </div>

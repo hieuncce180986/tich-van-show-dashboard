@@ -222,7 +222,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
     setIsLoading(true);
 
     const body = {
-      show_name: "Tên Show diễn",
+      show_name: "Hoa Độc Điền Trang",
       name: name,
       email: email,
       phone: phone,
@@ -241,7 +241,6 @@ export function ModalUpdateTicket({ data }: { data: any }) {
         response = await TicketService.updateTicket(data?._id, body);
       } else if (status === "approved") {
         response = await TicketService.approveTicket(data?._id, body);
-        console.log("check body: APV", JSON.stringify(body));
       } else if (status === "rejected") {
         response = await TicketService.rejectTicket(data?._id, body);
       }
