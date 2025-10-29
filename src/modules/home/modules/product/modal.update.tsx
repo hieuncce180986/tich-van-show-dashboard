@@ -380,8 +380,8 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                   className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
                 >
                   <option value="">Chọn suất chiếu</option>
-                  <option value="show-morning">Sáng (8:00)</option>
-                  <option value="show-afternoon">Chiều (14:00)</option>
+                  <option value="show-morning">Sáng (9h00 - 10h30)</option>
+                  <option value="show-afternoon">Chiều (18h00 - 19h30)</option>
                 </select>
               </div>
               <Label htmlFor="status" className="text-[14.5px] mt-2">
