@@ -315,8 +315,8 @@ export function ModalUpdateTicket({ data }: { data: any }) {
             </span>
           </DialogDescription>
         </DialogHeader>
-        <div className="w-full grid grid-cols-3 gap-8">
-          <div className="col-span-2">
+        <div className="w-full grid grid-cols-1 gap-8">
+          <div className="col-span-1">
             <div className="flex flex-col justify-start items-start gap-2 overflow-y-auto hide-scrollbar max-h-[70vh] pr-0 scroll-bar-style">
               <Label htmlFor="description" className="text-[14.5px]">
                 Họ và tên
@@ -354,7 +354,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                   className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
                 />
               </div>
-              <Label htmlFor="description" className="text-[14.5px]">
+              {/* <Label htmlFor="description" className="text-[14.5px]">
                 Giá vé
               </Label>
               <div className="w-full grid items-center gap-4">
@@ -366,7 +366,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                   placeholder="Giá vé"
                   className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
                 />
-              </div>
+              </div> */}
               <Label htmlFor="description" className="text-[14.5px] mt-2">
                 Chọn suất chiếu
               </Label>
@@ -421,7 +421,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                 />
               </div>
 
-              <Label htmlFor="total" className="text-[14.5px]">
+              {/* <Label htmlFor="total" className="text-[14.5px]">
                 Tổng cộng
               </Label>
               <div className="w-full grid items-center gap-4">
@@ -433,7 +433,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                   placeholder="Tổng cộng"
                   className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
                 />
-              </div>
+              </div> */}
 
               {status === "rejected" && (
                 <>
@@ -454,7 +454,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
             </div>
           </div>
           <div className="col-span-1">
-            <div className="overflow-y-auto hide-scrollbar max-h-[70vh] scroll-bar-style">
+            {/* <div className="overflow-y-auto hide-scrollbar max-h-[70vh] scroll-bar-style">
               <div className="mb-6">
                 <Label htmlFor="bankImage" className="text-right !text-[16px]">
                   Hình ảnh chuyển khoản
@@ -482,8 +482,8 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                   />
                   {mainPreview && (
                     <div className="mt-2">
-                      <div className="relative group w-full h-full">
-                        {/* <div className="absolute top-0 left-0 right-0 bottom-0 group-hover:bg-black rounded-md opacity-25 z-0 transform duration-200"></div>
+                      <div className="relative group w-full h-full"> */}
+            {/* <div className="absolute top-0 left-0 right-0 bottom-0 group-hover:bg-black rounded-md opacity-25 z-0 transform duration-200"></div>
                         <div className="cursor-pointer absolute top-[43%] left-[43%] hidden group-hover:flex z-10 transform duration-200">
                           <div className="bg-indigo-600 hover:bg-indigo-700 p-2 rounded-full">
                             <Upload
@@ -493,7 +493,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                             />
                           </div>
                         </div> */}
-                        <Lens hovering={hovering} setHovering={setHovering}>
+            {/* <Lens hovering={hovering} setHovering={setHovering}>
                           <Image
                             src={mainPreview}
                             alt="bank-image-preview"
@@ -507,7 +507,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                   )}
                 </div>
               </div>
-            </div>
+            </div>*/}
           </div>
         </div>
         <DialogFooter className="w-full !flex !flex-row !justify-between !items-center">

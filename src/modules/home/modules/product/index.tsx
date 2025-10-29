@@ -15,19 +15,16 @@ type TicketData = {
     total_quantity: number;
     total_quantity_pending_show_morning: number;
     total_quantity_pending_show_afternoon: number;
-    total_price: number;
   };
   approved: {
     tickets: any[];
     total_quantity: number;
     total_quantity_approved_show_morning: number;
     total_quantity_approved_show_afternoon: number;
-    total_price: number;
   };
   rejected: {
     tickets: any[];
     total_quantity: number;
-    total_price: number;
   };
 };
 
@@ -42,16 +39,14 @@ export default function Tickets() {
       total_quantity: 0,
       total_quantity_pending_show_morning: 0,
       total_quantity_pending_show_afternoon: 0,
-      total_price: 0,
     },
     approved: {
       tickets: [],
       total_quantity: 0,
       total_quantity_approved_show_morning: 0,
       total_quantity_approved_show_afternoon: 0,
-      total_price: 0,
     },
-    rejected: { tickets: [], total_quantity: 0, total_price: 0 },
+    rejected: { tickets: [], total_quantity: 0 },
   });
   const [originalData, setOriginalData] = useState<TicketData>({
     pending: {
@@ -59,16 +54,14 @@ export default function Tickets() {
       total_quantity: 0,
       total_quantity_pending_show_morning: 0,
       total_quantity_pending_show_afternoon: 0,
-      total_price: 0,
     },
     approved: {
       tickets: [],
       total_quantity: 0,
       total_quantity_approved_show_morning: 0,
       total_quantity_approved_show_afternoon: 0,
-      total_price: 0,
     },
-    rejected: { tickets: [], total_quantity: 0, total_price: 0 },
+    rejected: { tickets: [], total_quantity: 0 },
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [totalPage, setTotalPage] = useState<number>(0);
@@ -162,12 +155,7 @@ export default function Tickets() {
       ticketData.approved.total_quantity +
       ticketData.rejected.total_quantity;
 
-    const totalPrice =
-      ticketData.pending.total_price +
-      ticketData.approved.total_price +
-      ticketData.rejected.total_price;
-
-    return { totalTickets, totalQuantity, totalPrice };
+    return { totalTickets, totalQuantity };
   };
 
   const init = async () => {
@@ -184,16 +172,14 @@ export default function Tickets() {
           total_quantity: 0,
           total_quantity_pending_show_morning: 0,
           total_quantity_pending_show_afternoon: 0,
-          total_price: 0,
         },
         approved: {
           tickets: [],
           total_quantity: 0,
           total_quantity_approved_show_morning: 0,
           total_quantity_approved_show_afternoon: 0,
-          total_price: 0,
         },
-        rejected: { tickets: [], total_quantity: 0, total_price: 0 },
+        rejected: { tickets: [], total_quantity: 0 },
       });
       setIsLoading(false);
     }
@@ -238,48 +224,6 @@ export default function Tickets() {
           </div>
         </div>
         <div className="h-full lg:h-[640px] flex flex-col justify-start gap-5">
-          {/* Summary Statistics */}
-          {/* <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mt-5">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">
-              Tổng quan vé
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {getTotalStats().totalQuantity}
-                </div>
-                <div className="text-sm text-gray-600">Tổng số lượng vé</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-500">
-                  {ticketData.pending.total_quantity}
-                </div>
-                <div className="text-sm text-gray-600">Đang chờ</div>
-                <div className="text-xs text-blue-400">
-                  {ticketData.pending.total_price.toLocaleString()} VND
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-500">
-                  {ticketData.approved.total_quantity}
-                </div>
-                <div className="text-sm text-gray-600">Đã duyệt</div>
-                <div className="text-xs text-green-400">
-                  {ticketData.approved.total_price.toLocaleString()} VND
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-500">
-                  {ticketData.rejected.total_quantity}
-                </div>
-                <div className="text-sm text-gray-600">Đã từ chối</div>
-                <div className="text-xs text-red-400">
-                  {ticketData.rejected.total_price.toLocaleString()} VND
-                </div>
-              </div>
-            </div>
-          </div> */}
-
           <div className="flex flex-col mt-5">
             <div className="flex flex-row justify-start items-center gap-6">
               <div
@@ -337,9 +281,6 @@ export default function Tickets() {
                         vé
                       </div>
                     </div>
-                    <span className="text-sm text-fuchsia-700 font-bold">
-                      {ticketData.pending.total_price.toLocaleString()} VND
-                    </span>
                   </div>
                 </div>
                 <div className="flex flex-row items-center">
@@ -366,9 +307,6 @@ export default function Tickets() {
                         vé
                       </div>
                     </div>
-                    <span className="text-sm text-fuchsia-700 font-bold">
-                      {ticketData.approved.total_price.toLocaleString()} VND
-                    </span>
                   </div>
                 </div>
               </div>
@@ -404,22 +342,7 @@ export default function Tickets() {
                     <strong className="text-lg text-red-600">
                       {ticketData.rejected.total_quantity} vé
                     </strong>
-                    <br />
-                    <span className="text-sm text-red-500">
-                      {ticketData.rejected.total_price.toLocaleString()} VND
-                    </span>
                   </div>
-                </div>
-              </div>
-              <div className="flex flex-col lg:flex-row justify-start items-start gap-6">
-                <div className="cursor-pointer px-4 py-1 rounded-lg bg-indigo-50 border border-indigo-200">
-                  DOANH THU:{" "}
-                  <strong className="text-lg text-indigo-600">
-                    {ticketData.approved.total_price // ticketData.pending.total_price +
-                      // + ticketData.rejected.total_price
-                      .toLocaleString()}{" "}
-                    VND
-                  </strong>
                 </div>
               </div>
             </div>
@@ -453,9 +376,6 @@ export default function Tickets() {
                         </th>
                         <th scope="col" className="w-32 px-4 py-3">
                           Số lượng
-                        </th>
-                        <th scope="col" className="w-32 px-4 py-3">
-                          Tổng tiền
                         </th>
                         <th scope="col" className="w-32 py-3">
                           Trạng thái
@@ -497,9 +417,6 @@ export default function Tickets() {
                             </td>
                             <td className="w-32 text-[14px] px-11 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                               {item?.quantity}
-                            </td>
-                            <td className="w-32 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                              {item?.total?.toLocaleString()} VND
                             </td>
                             <td className="w-32 text-[14px] px-0 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                               <span
