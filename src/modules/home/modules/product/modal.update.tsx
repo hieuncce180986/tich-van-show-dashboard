@@ -12,91 +12,24 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import ProductDescriptionEditor from "./quill";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { TicketService } from "@/services/product";
-import { ImageUp, Loader, Plus, SquarePen, Upload, X } from "lucide-react";
-import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
-import Select from "react-select";
-import { UploadService } from "@/services/upload";
-import { Lens } from "@/components/ui/lens";
+import { Loader, SquarePen } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function ModalUpdateTicket({ data }: { data: any }) {
-  const [hovering, setHovering] = useState(false);
-
   const { toast } = useToast();
 
-  const mainImageInputRef = useRef<HTMLInputElement>(null);
-  const secondaryImageInputRef = useRef<HTMLInputElement>(null);
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const [mainPreview, setMainPreview] = useState<string | null>(null);
-  const [secondaryPreviews, setSecondaryPreviews] = useState<string[]>([]);
-  const [videoPreview, setVideoPreview] = useState<string | null>(null);
 
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [schedule, setSchedule] = useState<string>("");
-  const [price, setPrice] = useState<number>(69000);
   const [quantity, setQuantity] = useState<number>(0);
-  const [total, setTotal] = useState<number>(0);
-  const [bankImage, setBankImage] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const [rejectedReason, setRejectedReason] = useState<string>("");
-
-  const handleMainImageChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert("File quá lớn. Vui lòng chọn file nhỏ hơn 5MB");
-      return;
-    }
-    if (!file.type.startsWith("image/")) {
-      alert("Vui lòng chọn file hình ảnh");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setMainPreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleSecondaryImagesChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
-    const newPreviews: string[] = [];
-    Array.from(files).forEach((file) => {
-      if (file.size > 5 * 1024 * 1024) {
-        alert(`File ${file.name} quá lớn. Vui lòng chọn file nhỏ hơn 5MB.`);
-        return;
-      }
-      if (!file.type.startsWith("image/")) {
-        alert(`File ${file.name} không phải là hình ảnh.`);
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        newPreviews.push(reader.result as string);
-        if (newPreviews.length === files.length) {
-          setSecondaryPreviews((prev) => [...prev, ...newPreviews]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleUpdateMainImage = () => {
-    mainImageInputRef.current?.click();
-  };
 
   const validateForm = () => {
     if (!name.trim()) {
@@ -158,65 +91,6 @@ export function ModalUpdateTicket({ data }: { data: any }) {
     return true;
   };
 
-  const handleImageUpload = useCallback(async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      const uploadResponse = await UploadService.uploadToCloudinary([file]);
-      if (
-        uploadResponse &&
-        Array.isArray(uploadResponse) &&
-        uploadResponse[0]
-      ) {
-        return uploadResponse[0]?.secure_url;
-      } else {
-        console.error("Upload failed or response is not as expected");
-        return "";
-      }
-    } catch (error) {
-      console.error("Image upload failed:", error);
-      return "";
-    }
-  }, []);
-
-  const extractBase64Images = (htmlContent: string) => {
-    const imgTagRegex =
-      /<img[^>]+src=["'](data:image\/[^;]+;base64[^"']+)["'][^>]*>/g;
-    const matches = [...htmlContent.matchAll(imgTagRegex)];
-    return matches.map((match) => match[1]);
-  };
-
-  const replaceBase64WithCloudUrls = async (
-    htmlContent: string,
-    uploadFunc: (file: File) => Promise<string>
-  ) => {
-    const imgTagRegex =
-      /<img[^>]+src=["'](data:image\/[^;]+;base64[^"']+)["'][^>]*>/g;
-    let updatedContent = htmlContent;
-
-    const matches = [...htmlContent.matchAll(imgTagRegex)];
-    for (const match of matches) {
-      const base64String = match[1];
-      const file = base64ToFile(base64String);
-      const uploadedUrl = await uploadFunc(file);
-      updatedContent = updatedContent.replace(base64String, uploadedUrl);
-    }
-
-    return updatedContent;
-  };
-
-  const base64ToFile = (base64String: string): File => {
-    const arr = base64String.split(",");
-    const mime = arr[0].match(/:(.*?);/)?.[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], "image.png", { type: mime });
-  };
-
   const handleSubmit = async () => {
     if (!validateForm()) return;
     setIsLoading(true);
@@ -227,11 +101,9 @@ export function ModalUpdateTicket({ data }: { data: any }) {
       email: email,
       phone: phone,
       schedule: schedule,
-      quantity: quantity,
-      total: total,
+      quantity: 1,
       status: status,
       rejected_reason: status === "rejected" ? rejectedReason : "",
-      bank_image: mainPreview,
     };
 
     let response;
@@ -272,14 +144,9 @@ export function ModalUpdateTicket({ data }: { data: any }) {
       setEmail(data?.email || "");
       setPhone(data?.phone || "");
       setSchedule(data?.schedule || "");
-      setPrice(data?.price || 69000);
       setQuantity(data?.quantity || 0);
-      setTotal(data?.total || 0);
-      setBankImage(data?.bank_image || "");
       setStatus(data?.status || "");
       setRejectedReason(data?.rejected_reason || "");
-      setMainPreview(data?.bank_image || "");
-      setSecondaryPreviews(data?.images || []);
     }
   };
 
@@ -414,7 +281,6 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                   onChange={(e) => {
                     const newQuantity = parseInt(e.target.value) || 0;
                     setQuantity(newQuantity);
-                    setTotal(newQuantity * price);
                   }}
                   placeholder="Số lượng"
                   className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
