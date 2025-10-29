@@ -492,8 +492,8 @@ export default function Tickets() {
                             </td>
                             <td className="w-32 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                               {item?.schedule === "show-morning"
-                                ? "Sáng (8:00)"
-                                : "Tối (18:00)"}
+                                ? "Sáng (9:30 - 11h00)"
+                                : "Tối (18:30 - 20h00)"}
                             </td>
                             <td className="w-32 text-[14px] px-11 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                               {item?.quantity}
