@@ -71,6 +71,9 @@ export default function Tickets() {
   const [activeTab, setActiveTab] = useState<
     "pending" | "approved" | "rejected"
   >("pending");
+  const [scheduleFilter, setScheduleFilter] = useState<
+    "all" | "show-morning" | "show-afternoon"
+  >("all");
 
   const selectPage = (pageSelected: any) => {
     setCurrenPage(pageSelected);
@@ -130,6 +133,7 @@ export default function Tickets() {
   const switchTab = (tab: "pending" | "approved" | "rejected") => {
     setActiveTab(tab);
     setSearchId(""); // Reset search when switching tabs
+    setScheduleFilter("all"); // Reset schedule filter
     updateCurrentTabData(originalData[tab].tickets);
   };
 
@@ -225,36 +229,88 @@ export default function Tickets() {
         </div>
         <div className="h-full lg:h-[640px] flex flex-col justify-start gap-5">
           <div className="flex flex-col mt-5">
-            <div className="flex flex-row justify-start items-center gap-6">
-              <div
-                className={`cursor-pointer border px-2 py-1 rounded-lg w-36 text-center ${
-                  activeTab === "pending"
-                    ? "border-indigo-600 bg-indigo-600 text-white"
-                    : "border-gray-300 hover:bg-gray-50"
-                }`}
-                onClick={() => switchTab("pending")}
-              >
-                ĐANG CHỜ ({ticketData.pending.tickets.length})
+            <div className="flex flex-row justify-between items-center">
+              <div className="flex flex-row justify-start items-center gap-6">
+                <div
+                  className={`cursor-pointer border px-2 py-1 rounded-lg w-36 text-center ${
+                    activeTab === "pending"
+                      ? "border-indigo-600 bg-indigo-600 text-white"
+                      : "border-gray-300 hover:bg-gray-50"
+                  }`}
+                  onClick={() => switchTab("pending")}
+                >
+                  ĐANG CHỜ ({ticketData.pending.tickets.length})
+                </div>
+                <div
+                  className={`cursor-pointer border px-2 py-1 rounded-lg w-36 text-center ${
+                    activeTab === "approved"
+                      ? "border-indigo-600 bg-indigo-600 text-white"
+                      : "border-gray-300 hover:bg-gray-50"
+                  }`}
+                  onClick={() => switchTab("approved")}
+                >
+                  XÁC NHẬN ({ticketData.approved.tickets.length})
+                </div>
+                <div
+                  className={`cursor-pointer border px-2 py-1 rounded-lg w-36 text-center ${
+                    activeTab === "rejected"
+                      ? "border-indigo-600 bg-indigo-600 text-white"
+                      : "border-gray-300 hover:bg-gray-50"
+                  }`}
+                  onClick={() => switchTab("rejected")}
+                >
+                  TỪ CHỐI ({ticketData.rejected.tickets.length})
+                </div>
               </div>
-              <div
-                className={`cursor-pointer border px-2 py-1 rounded-lg w-36 text-center ${
-                  activeTab === "approved"
-                    ? "border-indigo-600 bg-indigo-600 text-white"
-                    : "border-gray-300 hover:bg-gray-50"
-                }`}
-                onClick={() => switchTab("approved")}
-              >
-                XÁC NHẬN ({ticketData.approved.tickets.length})
-              </div>
-              <div
-                className={`cursor-pointer border px-2 py-1 rounded-lg w-36 text-center ${
-                  activeTab === "rejected"
-                    ? "border-indigo-600 bg-indigo-600 text-white"
-                    : "border-gray-300 hover:bg-gray-50"
-                }`}
-                onClick={() => switchTab("rejected")}
-              >
-                TỪ CHỐI ({ticketData.rejected.tickets.length})
+              <div className="flex flex-row justify-start items-center gap-2">
+                <div
+                  className={`px-4 py-1 rounded-lg cursor-pointer w-28 text-center border ${
+                    scheduleFilter === "all"
+                      ? "bg-indigo-400 text-white border-indigo-400"
+                      : "bg-indigo-50 border-indigo-200 text-gray-900"
+                  }`}
+                  onClick={() => {
+                    setScheduleFilter("all");
+                    // show all tickets in this tab
+                    updateCurrentTabData(ticketData[activeTab].tickets);
+                  }}
+                >
+                  Tất cả
+                </div>
+                <div
+                  className={`px-4 py-1 rounded-lg cursor-pointer w-28 text-center border ${
+                    scheduleFilter === "show-morning"
+                      ? "bg-indigo-400 text-white border-indigo-400"
+                      : "bg-indigo-50 border-indigo-200 text-gray-900"
+                  }`}
+                  onClick={() => {
+                    setScheduleFilter("show-morning");
+                    // filter tickets which have schedule === 'show-morning'
+                    const filtered = ticketData[activeTab].tickets.filter(
+                      (t: any) => t.schedule === "show-morning"
+                    );
+                    updateCurrentTabData(filtered);
+                  }}
+                >
+                  Suất sáng
+                </div>
+                <div
+                  className={`px-4 py-1 rounded-lg cursor-pointer w-28 text-center border ${
+                    scheduleFilter === "show-afternoon"
+                      ? "bg-indigo-400 text-white border-indigo-400"
+                      : "bg-indigo-50 border-indigo-200 text-gray-900"
+                  }`}
+                  onClick={() => {
+                    setScheduleFilter("show-afternoon");
+                    // filter tickets which have schedule === 'show-afternoon'
+                    const filtered = ticketData[activeTab].tickets.filter(
+                      (t: any) => t.schedule === "show-afternoon"
+                    );
+                    updateCurrentTabData(filtered);
+                  }}
+                >
+                  Suất tối
+                </div>
               </div>
             </div>
             <div className="flex flex-col lg:flex-row justify-start items-start gap-6 w-full mt-5">
