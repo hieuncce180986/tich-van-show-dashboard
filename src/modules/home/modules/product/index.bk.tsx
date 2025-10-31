@@ -6,7 +6,7 @@ import Image from "next/image";
 import { ModalUpdateTicket } from "./modal.update";
 import { useEffect, useState } from "react";
 import { TicketService } from "@/services/product";
-import { Loader } from "lucide-react";
+import { Loader, MoveRight } from "lucide-react";
 import { HELPER } from "@/utils/helper";
 
 type TicketData = {
@@ -29,8 +29,9 @@ type TicketData = {
 };
 
 export default function Tickets() {
+  const COUNT = 5;
   const AMOUNT_MORNING_TICKETS = 30;
-  const AMOUNT_AFTERNOON_TICKETS = 31;
+  const AMOUNT_AFTERNOON_TICKETS = 30;
 
   const [ticketData, setTicketData] = useState<TicketData>({
     pending: {
@@ -63,6 +64,8 @@ export default function Tickets() {
     rejected: { tickets: [], total_quantity: 0 },
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [totalPage, setTotalPage] = useState<number>(0);
+  const [currenPage, setCurrenPage] = useState<any>(1 as any);
   const [currenData, setCurrenData] = useState<any>([] as any);
   const [morningData, setMorningData] = useState<any>([] as any);
   const [afternoonData, setAfternoonData] = useState<any>([] as any);
@@ -111,6 +114,26 @@ export default function Tickets() {
     return base;
   };
 
+  const selectPage = (pageSelected: any) => {
+    setCurrenPage(pageSelected);
+    const start = (pageSelected - 1) * COUNT;
+    const end = pageSelected * COUNT;
+    const currentTickets = getFilteredTickets();
+    setCurrenData(currentTickets.slice(start, end));
+  };
+
+  const prevPage = () => {
+    if (currenPage > 1) {
+      selectPage(currenPage - 1);
+    }
+  };
+
+  const nextPage = () => {
+    if (currenPage < totalPage) {
+      selectPage(currenPage + 1);
+    }
+  };
+
   const render = (data: TicketData) => {
     const morningData = data.pending.tickets.filter(
       (t: any) => t?.schedule === "show-morning"
@@ -127,7 +150,9 @@ export default function Tickets() {
   };
 
   const updateCurrentTabData = (tickets: any[]) => {
-    setCurrenData(tickets);
+    setTotalPage(Math.ceil(tickets.length / COUNT));
+    setCurrenPage(1);
+    setCurrenData(tickets.slice(0, COUNT));
   };
 
   const searchCustomerById = (id: string) => {
@@ -222,7 +247,7 @@ export default function Tickets() {
 
   useEffect(() => {
     // Compute top 10 earliest for morning and afternoon separately in approved tickets
-    const approvedTickets = originalData?.approved?.tickets || [];
+    const approvedTickets = ticketData?.approved?.tickets || [];
     const sortByCreatedAsc = (a: any, b: any) =>
       getCreatedTime(a) - getCreatedTime(b);
     const morning = approvedTickets
@@ -244,7 +269,7 @@ export default function Tickets() {
       if (id) ids.add(id);
     });
     setTop10EarliestIds(ids);
-  }, [originalData?.approved?.tickets]);
+  }, [ticketData?.approved?.tickets]);
 
   return (
     <section className="p-4">
@@ -467,36 +492,33 @@ export default function Tickets() {
                   <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 min-w-[800px]">
                     <thead className="text-md text-gray-700 uppercase bg-gray-50 border dark:bg-gray-700 dark:text-gray-400">
                       <tr>
-                        <th scope="col" className="w-10 px-2 py-3 text-center">
+                        <th scope="col" className="w-10 px-2 py-3">
                           STT
                         </th>
-                        <th scope="col" className="w-52 px-4 py-3 text-center">
+                        <th scope="col" className="w-52 px-4 py-3">
                           Họ và tên
                         </th>
-                        <th scope="col" className="w-32 px-4 py-3 text-center">
+                        <th scope="col" className="w-32 px-4 py-3">
                           Email
                         </th>
-                        <th scope="col" className="w-32 px-4 py-3 text-center">
+                        <th scope="col" className="w-32 px-4 py-3">
                           Số điện thoại
                         </th>
-                        <th scope="col" className="w-32 px-4 py-3 text-center">
+                        <th scope="col" className="w-32 px-4 py-3">
                           Suất chiếu
                         </th>
-                        <th scope="col" className="w-32 px-4 py-3 text-center">
+                        <th scope="col" className="w-32 px-4 py-3">
                           Số lượng
                         </th>
-                        <th scope="col" className="w-32 py-3 text-center">
+                        <th scope="col" className="w-32 py-3">
                           Trạng thái
                         </th>
                         {activeTab === "approved" && (
-                          <th
-                            scope="col"
-                            className="w-24 px-4 py-3 text-center"
-                          >
+                          <th scope="col" className="w-24 px-4 py-3">
                             TOP 10
                           </th>
                         )}
-                        <th scope="col" className="w-24 px-4 py-3 text-center">
+                        <th scope="col" className="w-24 px-4 py-3">
                           Chi tiết
                         </th>
                       </tr>
@@ -511,41 +533,35 @@ export default function Tickets() {
                               item?.deleted_at ? "hidden" : ""
                             } border-b border-l border-r dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700`}
                           >
-                            <td className="w-10 px-4 py-2 gap-3 items-center text-center">
-                              {index + 1}
+                            <td className="w-10 px-4 py-2 gap-3 items-center">
+                              {(currenPage - 1) * COUNT + index + 1}
                             </td>
                             <td className="w-52 px-4 py-2 gap-3 items-center">
-                              <div className="w-full col-span-9 text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300 text-center">
+                              <div className="w-full col-span-9 text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
                                 {item?.name}
                               </div>
                             </td>
-                            <td className="w-32 px-4 py-2 text-center">
-                              <span className="text-[14px] bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300 text-center">
+                            <td className="w-32 px-4 py-2">
+                              <span className="text-[14px] bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
                                 {item?.email}
                               </span>
                             </td>
-                            <td className="w-32 px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-                              <div className="flex items-center text-center">
+                            <td className="w-32 px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                              <div className="flex items-center">
                                 {item?.phone}
                               </div>
                             </td>
                             <td className="w-32 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                              {item?.schedule === "show-morning" ? (
-                                <div className="bg-yellow-100 px-2 py-1 rounded-full text-center">
-                                  Sáng &nbsp;(9:30 - 11h00)
-                                </div>
-                              ) : (
-                                <div className="bg-black text-white px-2 py-1 rounded-full text-center">
-                                  Tối &nbsp;(18:30 - 20h00)
-                                </div>
-                              )}
+                              {item?.schedule === "show-morning"
+                                ? "Sáng (9:30 - 11h00)"
+                                : "Tối (18:30 - 20h00)"}
                             </td>
-                            <td className="w-32 text-[14px] px-11 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+                            <td className="w-32 text-[14px] px-11 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                               {item?.quantity}
                             </td>
-                            <td className="w-32 text-[14px] px-0 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+                            <td className="w-32 text-[14px] px-0 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                               <span
-                                className={`px-2 py-1 rounded-full text-xs font-medium text-center ${
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
                                   item?.status === "pending"
                                     ? "bg-yellow-100 text-yellow-800"
                                     : item?.status === "approved" ||
@@ -560,18 +576,18 @@ export default function Tickets() {
                               </span>
                             </td>
                             {activeTab === "approved" && (
-                              <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+                              <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {top10EarliestIds.has(
                                   (item?._id as string) || (item?.id as string)
                                 ) ? (
-                                  <div className="flex flex-row items-center gap-2 text-center">
-                                    <div className="text-white bg-green-500 px-2 py-1 rounded-full flex text-center items-center justify-center w-full">
+                                  <div className="flex flex-row items-center gap-2">
+                                    <div className="text-white bg-green-500 px-2 py-1 rounded-full flex">
                                       YES
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="flex flex-row items-center gap-2 text-center">
-                                    <div className="text-white bg-red-500 px-2 py-1 rounded-full flex text-center items-center justify-center w-full">
+                                  <div className="flex flex-row items-center gap-2">
+                                    <div className="text-white bg-red-500 px-2 py-1 rounded-full flex">
                                       NO
                                     </div>
                                   </div>
@@ -588,6 +604,75 @@ export default function Tickets() {
                   </table>
                 </div>
               </div>
+              <nav
+                className="flex flex-col items-start justify-center mt-4 p-4 space-y-3 md:flex-row md:items-center md:space-y-0"
+                aria-label="Table navigation"
+              >
+                <ul className="inline-flex items-stretch -space-x-px">
+                  <li>
+                    <button
+                      onClick={prevPage}
+                      disabled={currenPage === 1}
+                      className="cursor-pointer flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-indigo-50 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    >
+                      <span className="sr-only">Previous</span>
+                      <svg
+                        className="w-5 h-5"
+                        aria-hidden="true"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </li>
+                  {Array.from({ length: totalPage }, (_, i) => i + 1)?.map(
+                    (item: any, index: any) => {
+                      return (
+                        <li key={index} onClick={() => selectPage(item)}>
+                          <a
+                            href="#"
+                            className={`${
+                              item === currenPage
+                                ? "bg-indigo-100 hover:bg-indigo-100 text-gray-700"
+                                : "bg-white hover:bg-indigo-50"
+                            } flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700`}
+                          >
+                            {item}
+                          </a>
+                        </li>
+                      );
+                    }
+                  )}
+                  <li>
+                    <button
+                      onClick={nextPage}
+                      disabled={currenPage === totalPage}
+                      className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-indigo-50 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    >
+                      <span className="sr-only">Next</span>
+                      <svg
+                        className="w-5 h-5"
+                        aria-hidden="true"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
             </>
           )}
         </div>
