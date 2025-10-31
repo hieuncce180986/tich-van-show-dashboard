@@ -67,6 +67,8 @@ export default function Tickets() {
   const [totalPage, setTotalPage] = useState<number>(0);
   const [currenPage, setCurrenPage] = useState<any>(1 as any);
   const [currenData, setCurrenData] = useState<any>([] as any);
+  const [morningData, setMorningData] = useState<any>([] as any);
+  const [afternoonData, setAfternoonData] = useState<any>([] as any);
   const [searchId, setSearchId] = useState<string>("");
   const [activeTab, setActiveTab] = useState<
     "pending" | "approved" | "rejected"
@@ -98,11 +100,25 @@ export default function Tickets() {
     return Number.MAX_SAFE_INTEGER;
   };
 
+  const getFilteredTickets = (
+    filter: "all" | "show-morning" | "show-afternoon" = scheduleFilter,
+    tab: "pending" | "approved" | "rejected" = activeTab
+  ) => {
+    const base = ticketData[tab]?.tickets || [];
+    if (filter === "show-morning") {
+      return base.filter((t: any) => t?.schedule === "show-morning");
+    }
+    if (filter === "show-afternoon") {
+      return base.filter((t: any) => t?.schedule === "show-afternoon");
+    }
+    return base;
+  };
+
   const selectPage = (pageSelected: any) => {
     setCurrenPage(pageSelected);
     const start = (pageSelected - 1) * COUNT;
     const end = pageSelected * COUNT;
-    const currentTickets = ticketData[activeTab].tickets;
+    const currentTickets = getFilteredTickets();
     setCurrenData(currentTickets.slice(start, end));
   };
 
@@ -119,6 +135,15 @@ export default function Tickets() {
   };
 
   const render = (data: TicketData) => {
+    const morningData = data.pending.tickets.filter(
+      (t: any) => t?.schedule === "show-morning"
+    );
+    const afternoonData = data.pending.tickets.filter(
+      (t: any) => t?.schedule === "show-afternoon"
+    );
+    setMorningData(morningData);
+    setAfternoonData(afternoonData);
+
     setOriginalData(data);
     setTicketData(data);
     updateCurrentTabData(data[activeTab].tickets);
@@ -183,8 +208,6 @@ export default function Tickets() {
   const init = async () => {
     const res = await TicketService.getAll();
     if (res) {
-      console.log("check data: ", res);
-
       render(res);
       setIsLoading(false);
     } else {
@@ -217,16 +240,36 @@ export default function Tickets() {
   }, [activeTab]);
 
   useEffect(() => {
-    const allTickets = originalData[activeTab]?.tickets || [];
-    const sorted = [...allTickets].sort(
-      (a: any, b: any) => getCreatedTime(a) - getCreatedTime(b)
-    );
-    const top10 = sorted
-      .slice(0, 10)
-      .map((t: any) => (t?._id as string) || (t?.id as string))
-      .filter(Boolean);
-    setTop10EarliestIds(new Set(top10));
-  }, [originalData, activeTab]);
+    // Re-apply schedule filter whenever filter, tab or ticket data changes
+    const filtered = getFilteredTickets();
+    updateCurrentTabData(filtered);
+  }, [scheduleFilter, activeTab, ticketData]);
+
+  useEffect(() => {
+    // Compute top 10 earliest for morning and afternoon separately in approved tickets
+    const approvedTickets = ticketData?.approved?.tickets || [];
+    const sortByCreatedAsc = (a: any, b: any) =>
+      getCreatedTime(a) - getCreatedTime(b);
+    const morning = approvedTickets
+      .filter((t: any) => t?.schedule === "show-morning")
+      .sort(sortByCreatedAsc)
+      .slice(0, 10);
+    const afternoon = approvedTickets
+      .filter((t: any) => t?.schedule === "show-afternoon")
+      .sort(sortByCreatedAsc)
+      .slice(0, 10);
+    const ids = new Set<string>();
+    const getId = (t: any) => (t?._id as string) || (t?.id as string);
+    morning.forEach((t: any) => {
+      const id = getId(t);
+      if (id) ids.add(id);
+    });
+    afternoon.forEach((t: any) => {
+      const id = getId(t);
+      if (id) ids.add(id);
+    });
+    setTop10EarliestIds(ids);
+  }, [ticketData?.approved?.tickets]);
 
   return (
     <section className="p-4">
@@ -301,8 +344,6 @@ export default function Tickets() {
                   }`}
                   onClick={() => {
                     setScheduleFilter("all");
-                    // show all tickets in this tab
-                    updateCurrentTabData(ticketData[activeTab].tickets);
                   }}
                 >
                   Tất cả
@@ -315,11 +356,6 @@ export default function Tickets() {
                   }`}
                   onClick={() => {
                     setScheduleFilter("show-morning");
-                    // filter tickets which have schedule === 'show-morning'
-                    const filtered = ticketData[activeTab].tickets.filter(
-                      (t: any) => t.schedule === "show-morning"
-                    );
-                    updateCurrentTabData(filtered);
                   }}
                 >
                   Suất sáng
@@ -332,11 +368,6 @@ export default function Tickets() {
                   }`}
                   onClick={() => {
                     setScheduleFilter("show-afternoon");
-                    // filter tickets which have schedule === 'show-afternoon'
-                    const filtered = ticketData[activeTab].tickets.filter(
-                      (t: any) => t.schedule === "show-afternoon"
-                    );
-                    updateCurrentTabData(filtered);
                   }}
                 >
                   Suất tối
@@ -346,7 +377,7 @@ export default function Tickets() {
             <div className="flex flex-col lg:flex-row justify-start items-start gap-6 w-full mt-5">
               <div className="flex flex-row justify-start items-start gap-6">
                 <div className="flex flex-row items-center">
-                  <div className="cursor-pointer px-4 py-1 rounded-lg bg-yellow-50 border border-yellow-200">
+                  <div className="cursor-pointer px-4 py-1 rounded-lg bg-yellow-50 border border-yellow-200 h-24">
                     ĐANG CHỜ:{" "}
                     <span className="text-lg text-black font-bold italic">
                       {" "}
@@ -359,7 +390,7 @@ export default function Tickets() {
                         vé
                       </div>
                       <div className="text-lg text-black flex flex-row items-center gap-2">
-                        Suất chiều:{" "}
+                        Suất tối:{" "}
                         {
                           ticketData.pending
                             .total_quantity_pending_show_afternoon
@@ -370,7 +401,7 @@ export default function Tickets() {
                   </div>
                 </div>
                 <div className="flex flex-row items-center">
-                  <div className="cursor-pointer px-4 py-1 rounded-lg bg-green-50 border border-green-200">
+                  <div className="cursor-pointer px-4 py-1 rounded-lg bg-green-50 border border-green-200 h-24">
                     XÁC NHẬN:{" "}
                     <span className="text-lg text-black font-bold italic">
                       {ticketData.approved.total_quantity} vé
@@ -385,7 +416,7 @@ export default function Tickets() {
                         vé
                       </div>
                       <div className="text-lg text-black flex flex-row items-center gap-2">
-                        Suất chiều:{" "}
+                        Suất tối:{" "}
                         {
                           ticketData.approved
                             .total_quantity_approved_show_afternoon
@@ -398,7 +429,7 @@ export default function Tickets() {
               </div>
               <div className="flex flex-row justify-start items-start gap-6">
                 <div className="flex flex-row items-center">
-                  <div className="cursor-pointer px-4 py-1 rounded-lg bg-blue-50 border border-blue-200">
+                  <div className="cursor-pointer px-4 py-1 rounded-lg bg-blue-50 border border-blue-200 h-24">
                     CÒN LẠI:{" "}
                     <div>
                       <div className="text-lg text-black flex flex-row items-center gap-2">
@@ -411,13 +442,26 @@ export default function Tickets() {
                         vé
                       </div>
                       <div className="text-lg text-black flex flex-row items-center gap-2">
-                        Suất chiều:{" "}
-                        {AMOUNT_AFTERNOON_TICKETS -
-                          (ticketData.approved
-                            .total_quantity_approved_show_afternoon +
-                            ticketData.pending
-                              .total_quantity_pending_show_afternoon)}{" "}
-                        vé
+                        Suất tối:{" "}
+                        <span
+                          className={`font-bold ${
+                            AMOUNT_AFTERNOON_TICKETS -
+                              (ticketData.approved
+                                .total_quantity_approved_show_afternoon +
+                                ticketData.pending
+                                  .total_quantity_pending_show_afternoon) >
+                            0
+                              ? "text-green-500"
+                              : "text-red-500"
+                          }`}
+                        >
+                          {AMOUNT_AFTERNOON_TICKETS -
+                            (ticketData.approved
+                              .total_quantity_approved_show_afternoon +
+                              ticketData.pending
+                                .total_quantity_pending_show_afternoon)}{" "}
+                          vé
+                        </span>
                       </div>
                     </div>
                   </div>
