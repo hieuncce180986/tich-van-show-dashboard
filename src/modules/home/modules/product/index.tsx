@@ -74,6 +74,29 @@ export default function Tickets() {
   const [scheduleFilter, setScheduleFilter] = useState<
     "all" | "show-morning" | "show-afternoon"
   >("all");
+  const [top10EarliestIds, setTop10EarliestIds] = useState<Set<string>>(
+    new Set()
+  );
+
+  const getCreatedTime = (ticket: any) => {
+    const raw =
+      ticket?.createdAt ||
+      ticket?.created_at ||
+      ticket?.createdDate ||
+      ticket?.created ||
+      ticket?.updatedAt ||
+      ticket?.updated_at;
+    if (raw) {
+      const d = new Date(raw as any);
+      const t = d.getTime();
+      if (!Number.isNaN(t)) return t;
+    }
+    if (typeof ticket?._id === "string" && ticket._id.length >= 8) {
+      const ts = parseInt(ticket._id.substring(0, 8), 16) * 1000;
+      if (!Number.isNaN(ts)) return ts;
+    }
+    return Number.MAX_SAFE_INTEGER;
+  };
 
   const selectPage = (pageSelected: any) => {
     setCurrenPage(pageSelected);
@@ -137,11 +160,6 @@ export default function Tickets() {
     updateCurrentTabData(originalData[tab].tickets);
   };
 
-  const refreshData = async () => {
-    setIsLoading(true);
-    await init();
-  };
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     searchCustomerById(value);
@@ -197,6 +215,18 @@ export default function Tickets() {
     // Update current tab data when activeTab changes
     updateCurrentTabData(originalData[activeTab].tickets);
   }, [activeTab]);
+
+  useEffect(() => {
+    const allTickets = originalData[activeTab]?.tickets || [];
+    const sorted = [...allTickets].sort(
+      (a: any, b: any) => getCreatedTime(a) - getCreatedTime(b)
+    );
+    const top10 = sorted
+      .slice(0, 10)
+      .map((t: any) => (t?._id as string) || (t?.id as string))
+      .filter(Boolean);
+    setTop10EarliestIds(new Set(top10));
+  }, [originalData, activeTab]);
 
   return (
     <section className="p-4">
@@ -418,6 +448,9 @@ export default function Tickets() {
                   <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 min-w-[800px]">
                     <thead className="text-md text-gray-700 uppercase bg-gray-50 border dark:bg-gray-700 dark:text-gray-400">
                       <tr>
+                        <th scope="col" className="w-10 px-2 py-3">
+                          STT
+                        </th>
                         <th scope="col" className="w-52 px-4 py-3">
                           Họ và tên
                         </th>
@@ -436,6 +469,11 @@ export default function Tickets() {
                         <th scope="col" className="w-32 py-3">
                           Trạng thái
                         </th>
+                        {activeTab === "approved" && (
+                          <th scope="col" className="w-24 px-4 py-3">
+                            TOP 10
+                          </th>
+                        )}
                         <th scope="col" className="w-24 px-4 py-3">
                           Chi tiết
                         </th>
@@ -451,6 +489,9 @@ export default function Tickets() {
                               item?.deleted_at ? "hidden" : ""
                             } border-b border-l border-r dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700`}
                           >
+                            <td className="w-10 px-4 py-2 gap-3 items-center">
+                              {(currenPage - 1) * COUNT + index + 1}
+                            </td>
                             <td className="w-52 px-4 py-2 gap-3 items-center">
                               <div className="w-full col-span-9 text-[14px] line-clamp-2 bg-primary-100 text-gray-900 font-medium py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
                                 {item?.name}
@@ -490,6 +531,25 @@ export default function Tickets() {
                                   : item?.status?.toUpperCase()}
                               </span>
                             </td>
+                            {activeTab === "approved" && (
+                              <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                {top10EarliestIds.has(
+                                  (item?._id as string) || (item?.id as string)
+                                ) ? (
+                                  <div className="flex flex-row items-center gap-2">
+                                    <div className="text-white bg-green-500 px-2 py-1 rounded-full flex">
+                                      YES
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-row items-center gap-2">
+                                    <div className="text-white bg-red-500 px-2 py-1 rounded-full flex">
+                                      NO
+                                    </div>
+                                  </div>
+                                )}
+                              </td>
+                            )}
                             <td className="w-24 text-[14px] px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                               <ModalUpdateTicket data={item} />
                             </td>
