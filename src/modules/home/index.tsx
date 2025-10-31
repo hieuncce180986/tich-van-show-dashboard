@@ -58,7 +58,7 @@ export default function HomeClient() {
                 <BreadcrumbItem>
                   <BreadcrumbPage>
                     <span className="text-[16px]">
-                      {renderBreadcrumb(param.get("tab") || "tab1")}
+                      {renderBreadcrumb(param.get("tab") || "tickets")}
                     </span>
                   </BreadcrumbPage>
                 </BreadcrumbItem>
@@ -68,7 +68,7 @@ export default function HomeClient() {
         </header>
         <div className="w-full h-[1.5px] bg-black opacity-10"></div>
         <div className="flex flex-1 flex-col">
-          {renderTab(param.get("tab") || "tab1")}
+          {renderTab(param.get("tab") || "tickets")}
         </div>
       </SidebarInset>
     </SidebarProvider>

@@ -17,8 +17,10 @@ import { useToast } from "@/hooks/use-toast";
 import { TicketService } from "@/services/product";
 import { Loader, SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
 export function ModalUpdateTicket({ data }: { data: any }) {
+  const isLogin = Cookies.get("isLogin");
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -172,11 +174,11 @@ export function ModalUpdateTicket({ data }: { data: any }) {
       >
         <DialogHeader>
           <DialogTitle>
-            <span className="!text-[20px]">Chỉnh sửa sản phẩm</span>
+            <span className="!text-[20px]">Chỉnh sửa vé khách hàng</span>
           </DialogTitle>
           <DialogDescription>
             <span className="!text-[16px]">
-              Chỉnh sửa thông tin sản phẩm và nhấn{" "}
+              Chỉnh sửa thông tin vé khách hàng và nhấn{" "}
               <strong className="text-indigo-600">Cập nhật</strong> để lưu thông
               tin.
             </span>
@@ -195,6 +197,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Họ và tên"
                   className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                  disabled={isLogin === "ticket"}
                 />
               </div>
               <Label htmlFor="email" className="text-[14.5px]">
@@ -207,6 +210,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
                   className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                  disabled={isLogin === "ticket"}
                 />
               </div>
               <Label htmlFor="phone" className="text-[14.5px]">
@@ -219,6 +223,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="Số điện thoại"
                   className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                  disabled={isLogin === "ticket"}
                 />
               </div>
               {/* <Label htmlFor="description" className="text-[14.5px]">
@@ -245,6 +250,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                     setSchedule(e.target.value);
                   }}
                   className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                  disabled={isLogin === "ticket"}
                 >
                   <option value="">Chọn suất chiếu</option>
                   <option value="show-morning">Sáng (9h30 - 11h00)</option>
@@ -262,6 +268,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                     setStatus(e.target.value);
                   }}
                   className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                  disabled={isLogin === "ticket"}
                 >
                   <option value="">Chọn trạng thái</option>
                   <option value="pending">Đang chờ</option>
@@ -284,6 +291,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                   }}
                   placeholder="Số lượng"
                   className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                  disabled={isLogin === "ticket"}
                 />
               </div>
 
@@ -313,6 +321,7 @@ export function ModalUpdateTicket({ data }: { data: any }) {
                       onChange={(e) => setRejectedReason(e.target.value)}
                       placeholder="Nhập lý do từ chối"
                       className="col-span-3 p-2 border border-[#CFCFCF] rounded placeholder-custom focus:border-gray-500"
+                      disabled={isLogin === "ticket"}
                     />
                   </div>
                 </>
@@ -376,27 +385,29 @@ export function ModalUpdateTicket({ data }: { data: any }) {
             </div>*/}
           </div>
         </div>
-        <DialogFooter className="w-full !flex !flex-row !justify-between !items-center">
-          <div className="flex gap-2">
-            <DialogClose asChild>
-              <Button
-                type="button"
-                variant="secondary"
-                className="!px-10 !text-[16px]"
+        {isLogin === "admin" && (
+          <DialogFooter className="w-full !flex !flex-row !justify-between !items-center">
+            <div className="flex gap-2">
+              <DialogClose asChild>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="!px-10 !text-[16px]"
+                >
+                  Huỷ
+                </Button>
+              </DialogClose>
+              <button
+                type="submit"
+                onClick={handleSubmit}
+                className="flex flex-row justify-center items-center gap-2 text-white bg-indigo-600 hover:opacity-80 font-medium rounded-md text-sm !px-10 !text-[16px] py-2.5 text-center"
               >
-                Huỷ
-              </Button>
-            </DialogClose>
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              className="flex flex-row justify-center items-center gap-2 text-white bg-indigo-600 hover:opacity-80 font-medium rounded-md text-sm !px-10 !text-[16px] py-2.5 text-center"
-            >
-              Cập nhật
-              {isLoading && <Loader className="animate-spin" size={17} />}
-            </button>
-          </div>
-        </DialogFooter>
+                Cập nhật
+                {isLoading && <Loader className="animate-spin" size={17} />}
+              </button>
+            </div>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

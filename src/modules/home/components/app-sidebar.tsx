@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { FileText, PackageOpen, LogOut, Newspaper } from "lucide-react";
+import { PackageOpen, LogOut } from "lucide-react";
 import { NavProjects } from "./nav-projects";
 import { TeamSwitcher } from "./team-switcher";
 import {

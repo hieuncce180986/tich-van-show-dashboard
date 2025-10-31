@@ -35,7 +35,11 @@ export default function LoginClient() {
 
     try {
       if (username === "tichvanshow" && password === "tichvan@6789") {
-        Cookies.set("isLogin", "true", { expires: 7 });
+        Cookies.set("isLogin", "admin", { expires: 7 });
+        window.location.href = ROUTES.HOME;
+        setIsLoading(false);
+      } else if (username === "ticketcheck" && password === "ticket@6789") {
+        Cookies.set("isLogin", "ticket", { expires: 7 });
         window.location.href = ROUTES.HOME;
         setIsLoading(false);
       } else {
